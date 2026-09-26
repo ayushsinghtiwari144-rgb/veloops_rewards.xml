@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { Gift, Menu, X, LogIn, Trophy, HelpCircle, Compass, Home as HomeIcon, User, LogOut, UserPlus } from 'lucide-react';
+import { Gift, Menu, X, LogIn, Trophy, Compass, Home as HomeIcon, User, LogOut, UserPlus, HelpCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import styles from './Navbar.module.css';
 
@@ -16,6 +16,26 @@ const Navbar = () => {
     closeMobileMenu();
     await logout();
     navigate('/login');
+  };
+
+  const handleAnchorClick = (e, targetId) => {
+    e.preventDefault();
+    closeMobileMenu();
+
+    if (window.location.pathname !== '/') {
+      navigate('/', { replace: false });
+      setTimeout(() => {
+        const elem = document.getElementById(targetId);
+        if (elem) {
+          elem.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 150);
+    } else {
+      const elem = document.getElementById(targetId);
+      if (elem) {
+        elem.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
   };
 
   return (
@@ -43,7 +63,11 @@ const Navbar = () => {
               <HomeIcon size={16} className="me-1 inline-block" /> Home
             </NavLink>
 
-            <a href="#featured-giveaways" className={styles.navLink}>
+            <a
+              href="#featured-giveaways"
+              className={styles.navLink}
+              onClick={(e) => handleAnchorClick(e, 'featured-giveaways')}
+            >
               <Compass size={16} className="me-1 inline-block" /> Giveaways
             </a>
 
@@ -56,11 +80,19 @@ const Navbar = () => {
               <Trophy size={16} className="me-1 inline-block" /> Winners
             </NavLink>
 
-            <a href="#how-it-works" className={styles.navLink}>
+            <a
+              href="#how-it-works"
+              className={styles.navLink}
+              onClick={(e) => handleAnchorClick(e, 'how-it-works')}
+            >
               How It Works
             </a>
 
-            <a href="#faq" className={styles.navLink}>
+            <a
+              href="#faq"
+              className={styles.navLink}
+              onClick={(e) => handleAnchorClick(e, 'faq')}
+            >
               <HelpCircle size={16} className="me-1 inline-block" /> FAQ
             </a>
           </div>
@@ -120,7 +152,7 @@ const Navbar = () => {
               <a
                 href="#featured-giveaways"
                 className={styles.navLink}
-                onClick={closeMobileMenu}
+                onClick={(e) => handleAnchorClick(e, 'featured-giveaways')}
               >
                 <Compass size={16} className="me-2" /> Giveaways
               </a>
@@ -138,7 +170,7 @@ const Navbar = () => {
               <a
                 href="#how-it-works"
                 className={styles.navLink}
-                onClick={closeMobileMenu}
+                onClick={(e) => handleAnchorClick(e, 'how-it-works')}
               >
                 How It Works
               </a>
@@ -146,7 +178,7 @@ const Navbar = () => {
               <a
                 href="#faq"
                 className={styles.navLink}
-                onClick={closeMobileMenu}
+                onClick={(e) => handleAnchorClick(e, 'faq')}
               >
                 <HelpCircle size={16} className="me-2" /> FAQ
               </a>

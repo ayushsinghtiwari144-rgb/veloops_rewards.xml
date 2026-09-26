@@ -8,15 +8,20 @@ import styles from './GiveawayCard.module.css';
 const GiveawayCard = ({ giveaway }) => {
   const {
     slug,
+    title,
     name,
     description,
     image,
     status,
-    participants,
+    participants = 0,
     remainingTime,
-    entryAmount,
-    entryCurrency
+    endDate,
+    entryAmount = 50,
+    entryCurrency = 'VELOOP Points'
   } = giveaway;
+
+  const giveawayTitle = title || name || 'Promotional Reward';
+  const secondsLeft = remainingTime ?? (endDate ? Math.max(0, Math.floor((new Date(endDate) - new Date()) / 1000)) : 86400 * 3);
 
   const getStatusBadge = () => {
     switch (status) {
@@ -32,12 +37,12 @@ const GiveawayCard = ({ giveaway }) => {
   return (
     <div className={`card h-100 ${styles.card}`}>
       <div className={styles.imageContainer}>
-        <PrizeImage type={image} alt={name} height="190px" />
+        <PrizeImage type={image || slug} alt={giveawayTitle} height="190px" />
         {getStatusBadge()}
       </div>
 
       <div className="card-body d-flex flex-column p-4">
-        <h5 className="fw-bold text-dark mb-2">{name}</h5>
+        <h5 className="fw-bold text-dark mb-2">{giveawayTitle}</h5>
         <p className="text-secondary small mb-3 flex-grow-1" style={{ lineHeight: '1.5' }}>
           {description}
         </p>
@@ -46,7 +51,7 @@ const GiveawayCard = ({ giveaway }) => {
           <div className="text-muted extra-small fw-bold text-uppercase mb-1" style={{ fontSize: '0.65rem' }}>
             Time Remaining
           </div>
-          <Countdown secondsRemaining={remainingTime} />
+          <Countdown secondsRemaining={secondsLeft} />
         </div>
 
         <div className="d-flex align-items-center justify-content-between mb-3 pt-2 border-top">
