@@ -1,4 +1,29 @@
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+/**
+Helper to dynamically resolve and normalize API base URL
+*/
+export const getBaseUrl = () => {
+  let url = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || '';
+  
+  if (!url) {
+    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      url = '/api';
+    } else {
+      url = 'http://localhost:5000/api';
+    }
+  }
+
+  // Remove trailing slashes
+  url = url.replace(/\/+$/, '');
+
+  // Ensure path ends with /api if not already present
+  if (!url.endsWith('/api') && !url.includes('/api/')) {
+    url = `${url}/api`;
+  }
+
+  return url;
+};
+
+export const API_BASE_URL = getBaseUrl();
 
 /**
  * Get stored auth access token
@@ -8,7 +33,7 @@ export const getStoredToken = () => {
 };
 
 /**
- * Centralized API fetch wrapper with Bearer token, JSON response handling, and structured error throwing.
+ * Centralized API fetch wrapper with Bearer token, JSON response handling, network failure catching, and structured error throwing.
  */
 export const apiFetch = async (endpoint, options = {}) => {
   const token = getStoredToken();
@@ -18,14 +43,23 @@ export const apiFetch = async (endpoint, options = {}) => {
     ...options.headers
   };
 
+  const baseUrl = getBaseUrl();
   const url = endpoint.startsWith('http')
     ? endpoint
-    : `${API_BASE_URL}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+    : `${baseUrl}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
 
-  const response = await fetch(url, {
-    ...options,
-    headers
-  });
+  let response;
+  try {
+    response = await fetch(url, {
+      ...options,
+      headers
+    });
+  } catch (netErr) {
+    const error = new Error("We couldn't connect to the rewards server. Please ensure the backend API service is running and reachable.");
+    error.code = 'CONNECTION_ERROR';
+    error.originalError = netErr;
+    throw error;
+  }
 
   let data = null;
   try {
@@ -55,6 +89,6 @@ export const checkHealth = async () => {
     return data;
   } catch (error) {
     console.error('API health check error:', error);
-    return { success: false, message: 'Failed to connect to backend service' };
+    return { success: false, message: error.message || 'Failed to connect to backend service' };
   }
 };
