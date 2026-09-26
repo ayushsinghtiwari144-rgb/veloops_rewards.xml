@@ -1,6 +1,6 @@
 # VELOOP Rewards — Premium Full-Stack Giveaway Platform
 
-![VELOOP Rewards Platform](https://img.shields.io/badge/VELOOP-Rewards%20Platform-6366f1?style=for-the-badge&logo=react)
+![Deployment](https://img.shields.io/badge/Vercel-Live%20Public%20App-000000?style=for-the-badge&logo=vercel)
 ![Stack](https://img.shields.io/badge/Stack-React%20%7C%20Node.js%20%7C%20Express%20%7C%20MongoDB-green?style=for-the-badge)
 ![Security](https://img.shields.io/badge/Security-JWT%20%7C%20Bcrypt%20%7C%20Fraud%20Engine%20%7C%20Rate%20Limit-orange?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
