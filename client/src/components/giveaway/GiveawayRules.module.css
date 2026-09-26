@@ -1,0 +1,41 @@
+.rulesAccordion {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+}
+
+.ruleItem {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.ruleItem:last-child {
+  border-bottom: none;
+}
+
+.ruleHeader {
+  width: 100%;
+  padding: 1.25rem;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #0f172a;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.ruleHeader:hover {
+  background-color: #f8fafc;
+}
+
+.ruleBody {
+  padding: 0 1.25rem 1.25rem 1.25rem;
+  color: #475569;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}

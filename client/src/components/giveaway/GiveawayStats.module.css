@@ -1,0 +1,34 @@
+.statsSection {
+  background-color: #ffffff;
+  border-y: 1px solid #e2e8f0;
+  padding: 3rem 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+.statCard {
+  text-align: center;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  transition: transform 0.2s ease;
+}
+
+.statCard:hover {
+  transform: translateY(-3px);
+  border-color: #cbd5e1;
+}
+
+.statValue {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #0d6efd;
+  line-height: 1.2;
+}
+
+.statLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #475569;
+  margin-top: 0.35rem;
+}
