@@ -22,10 +22,12 @@ const Navbar = () => {
     e.preventDefault();
     closeMobileMenu();
 
-    const scrollToTarget = () => {
+    const doScroll = () => {
       const elem = document.getElementById(targetId);
       if (elem) {
-        elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const yOffset = -80;
+        const y = elem.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
       }
     };
 
@@ -36,14 +38,16 @@ const Navbar = () => {
         const elem = document.getElementById(targetId);
         attempts++;
         if (elem) {
-          elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          const yOffset = -80;
+          const y = elem.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
           clearInterval(interval);
-        } else if (attempts > 12) {
+        } else if (attempts > 15) {
           clearInterval(interval);
         }
       }, 50);
     } else {
-      scrollToTarget();
+      doScroll();
     }
   };
 

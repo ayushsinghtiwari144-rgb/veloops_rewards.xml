@@ -56,6 +56,17 @@ app.use(async (req, res, next) => {
   next();
 });
 
+// Root landing route for health & verification
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'VELOOP Rewards API Service is fully operational.',
+    environment: config.nodeEnv,
+    healthEndpoint: '/api/health',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Global API Rate Limiting
 app.use('/api', apiLimiter);
 
