@@ -8,10 +8,40 @@ const PrizeImage = ({ type, alt = 'Prize', height = '200px' }) => {
         return (
           <div className="d-flex flex-column align-items-center justify-content-center h-100 text-light bg-gradient p-4 rounded"
                style={{ background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)' }}>
-            <div className="p-3 rounded-4 bg-dark border border-secondary shadow-lg mb-2">
+            <div className="p-3 rounded-4 bg-dark border border-info shadow-lg mb-2">
               <Smartphone size={56} className="text-info" />
             </div>
             <span className="badge bg-info text-dark font-monospace mt-2">Titanium Edition</span>
+          </div>
+        );
+      case 'samsung':
+        return (
+          <div className="d-flex flex-column align-items-center justify-content-center h-100 text-light bg-gradient p-4 rounded"
+               style={{ background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)' }}>
+            <div className="p-3 rounded-4 bg-dark border border-cyan shadow-lg mb-2">
+              <Smartphone size={56} className="text-cyan text-light" />
+            </div>
+            <span className="badge bg-light text-dark font-monospace mt-2">Galaxy AI Ultra</span>
+          </div>
+        );
+      case 'pixel':
+        return (
+          <div className="d-flex flex-column align-items-center justify-content-center h-100 text-light bg-gradient p-4 rounded"
+               style={{ background: 'linear-gradient(135deg, #15803d 0%, #166534 100%)' }}>
+            <div className="p-3 rounded-4 bg-dark border border-success shadow-lg mb-2">
+              <Smartphone size={56} className="text-success" />
+            </div>
+            <span className="badge bg-success font-monospace mt-2">Gemini AI Pro</span>
+          </div>
+        );
+      case 'oneplus':
+        return (
+          <div className="d-flex flex-column align-items-center justify-content-center h-100 text-light bg-gradient p-4 rounded"
+               style={{ background: 'linear-gradient(135deg, #b91c1c 0%, #991b1b 100%)' }}>
+            <div className="p-3 rounded-4 bg-dark border border-danger shadow-lg mb-2">
+              <Smartphone size={56} className="text-danger" />
+            </div>
+            <span className="badge bg-danger font-monospace mt-2">Hasselblad 5G</span>
           </div>
         );
       case 'watch':

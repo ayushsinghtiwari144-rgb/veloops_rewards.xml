@@ -48,6 +48,33 @@ const seedDatabase = async () => {
     });
 
     const prize2 = await Prize.create({
+      name: 'Samsung Galaxy S24 Ultra (512GB)',
+      description: 'Galaxy AI features with Snapdragon 8 Gen 3 and 200MP camera.',
+      image: 'samsung',
+      prizeType: 'PHYSICAL',
+      value: 1299,
+      currency: 'USD'
+    });
+
+    const prize3 = await Prize.create({
+      name: 'Google Pixel 9 Pro (256GB)',
+      description: 'Advanced Gemini AI integration with Pro triple camera system.',
+      image: 'pixel',
+      prizeType: 'PHYSICAL',
+      value: 999,
+      currency: 'USD'
+    });
+
+    const prize4 = await Prize.create({
+      name: 'OnePlus 12 5G (512GB)',
+      description: 'Trinity Engine with Hasselblad 4th Gen Camera System and 100W charging.',
+      image: 'oneplus',
+      prizeType: 'PHYSICAL',
+      value: 799,
+      currency: 'USD'
+    });
+
+    const prize5 = await Prize.create({
       name: 'Apple Watch Series 9 GPS',
       description: 'Advanced health and activity tracker with Double Tap gesture.',
       image: 'watch',
@@ -56,7 +83,7 @@ const seedDatabase = async () => {
       currency: 'USD'
     });
 
-    const prize3 = await Prize.create({
+    const prize6 = await Prize.create({
       name: 'Apple AirPods Pro 2nd Gen',
       description: 'Active Noise Cancellation and Spatial Audio.',
       image: 'airpods',
@@ -65,7 +92,7 @@ const seedDatabase = async () => {
       currency: 'USD'
     });
 
-    const prize4 = await Prize.create({
+    const prize7 = await Prize.create({
       name: '$500 Amazon eGift Card',
       description: 'Digital gift voucher redeemable on Amazon worldwide.',
       image: 'giftcard',
@@ -74,19 +101,11 @@ const seedDatabase = async () => {
       currency: 'USD'
     });
 
-    const prize5 = await Prize.create({
-      name: 'Sony PlayStation 5 Slim',
-      description: 'Ultra-high speed SSD gaming console with DualSense controller.',
-      image: 'ps5',
-      prizeType: 'PHYSICAL',
-      value: 499,
-      currency: 'USD'
-    });
-
     console.log('[SEED] Creating giveaways...');
     const now = new Date();
     const threeDaysLater = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
     const fiveDaysLater = new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000);
+    const sevenDaysLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
     const tenDaysLater = new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000);
     const pastTenDays = new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000);
     const pastTwoDays = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
@@ -108,6 +127,54 @@ const seedDatabase = async () => {
     });
 
     const gw2 = await Giveaway.create({
+      title: 'Samsung Galaxy S24 Ultra (512GB)',
+      slug: 'samsung-galaxy-s24-ultra',
+      description: 'Experience next-level Galaxy AI innovation and 200MP camera.',
+      status: 'ACTIVE',
+      startDate: now,
+      endDate: fiveDaysLater,
+      entryCurrency: 'VELOOP Points',
+      entryAmount: 45,
+      eligibility: 'All platform users.',
+      rules: ['Single entry per account'],
+      terms: 'Official brand warranty included.',
+      winnerCount: 1,
+      isActive: true
+    });
+
+    const gw3 = await Giveaway.create({
+      title: 'Google Pixel 9 Pro (256GB)',
+      slug: 'google-pixel-9-pro',
+      description: 'Unleash Google Gemini AI intelligence and studio photo quality.',
+      status: 'ACTIVE',
+      startDate: now,
+      endDate: sevenDaysLater,
+      entryCurrency: 'VELOOP Points',
+      entryAmount: 40,
+      eligibility: 'All active platform members.',
+      rules: ['Single ticket allowed'],
+      terms: 'Worldwide shipping included.',
+      winnerCount: 1,
+      isActive: true
+    });
+
+    const gw4 = await Giveaway.create({
+      title: 'OnePlus 12 5G (512GB)',
+      slug: 'oneplus-12-5g',
+      description: 'Smooth beyond belief with Hasselblad camera and 100W charging.',
+      status: 'ACTIVE',
+      startDate: now,
+      endDate: fiveDaysLater,
+      entryCurrency: 'VELOOP Points',
+      entryAmount: 35,
+      eligibility: 'Verified members.',
+      rules: ['Single entry ticket'],
+      terms: 'Brand new sealed box.',
+      winnerCount: 1,
+      isActive: true
+    });
+
+    const gw5 = await Giveaway.create({
       title: 'Apple Watch Series 9 GPS',
       slug: 'apple-watch-series-9',
       description: 'Track your health and fitness with Series 9 GPS.',
@@ -123,7 +190,7 @@ const seedDatabase = async () => {
       isActive: true
     });
 
-    const gw3 = await Giveaway.create({
+    const gw6 = await Giveaway.create({
       title: 'Apple AirPods Pro 2nd Gen',
       slug: 'airpods-pro-2',
       description: 'Active Noise Cancellation and Spatial Audio.',
@@ -139,7 +206,7 @@ const seedDatabase = async () => {
       isActive: true
     });
 
-    const gw4 = await Giveaway.create({
+    const gw7 = await Giveaway.create({
       title: '$500 Amazon eGift Card',
       slug: 'amazon-500-gift-card',
       description: 'Shop millions of items online with $500 Amazon Gift Code.',
@@ -155,7 +222,7 @@ const seedDatabase = async () => {
       isActive: true
     });
 
-    const gw5 = await Giveaway.create({
+    const gw8 = await Giveaway.create({
       title: 'Sony PlayStation 5 Slim Edition',
       slug: 'sony-playstation-5-slim',
       description: 'Unleash next-gen gaming performance with 3D Audio.',
@@ -177,6 +244,8 @@ const seedDatabase = async () => {
     await GiveawayPrize.create({ giveawayId: gw3._id, prizeId: prize3._id, position: 1, quantity: 1 });
     await GiveawayPrize.create({ giveawayId: gw4._id, prizeId: prize4._id, position: 1, quantity: 1 });
     await GiveawayPrize.create({ giveawayId: gw5._id, prizeId: prize5._id, position: 1, quantity: 1 });
+    await GiveawayPrize.create({ giveawayId: gw6._id, prizeId: prize6._id, position: 1, quantity: 1 });
+    await GiveawayPrize.create({ giveawayId: gw7._id, prizeId: prize7._id, position: 1, quantity: 1 });
 
     console.log('[SEED] Seeding completed successfully!');
     console.log('Sample USER Credentials: user@veloop.com / password123');
