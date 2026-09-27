@@ -6,7 +6,7 @@ export const getBaseUrl = () => {
   
   if (!url) {
     if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-      url = '/api';
+      url = 'https://veloop-rewards-api.onrender.com/api';
     } else {
       url = 'http://localhost:5000/api';
     }

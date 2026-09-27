@@ -22,19 +22,28 @@ const Navbar = () => {
     e.preventDefault();
     closeMobileMenu();
 
-    if (window.location.pathname !== '/') {
-      navigate('/', { replace: false });
-      setTimeout(() => {
-        const elem = document.getElementById(targetId);
-        if (elem) {
-          elem.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 150);
-    } else {
+    const scrollToTarget = () => {
       const elem = document.getElementById(targetId);
       if (elem) {
-        elem.scrollIntoView({ behavior: 'smooth' });
+        elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
+    };
+
+    if (window.location.pathname !== '/') {
+      navigate('/', { replace: false });
+      let attempts = 0;
+      const interval = setInterval(() => {
+        const elem = document.getElementById(targetId);
+        attempts++;
+        if (elem) {
+          elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          clearInterval(interval);
+        } else if (attempts > 12) {
+          clearInterval(interval);
+        }
+      }, 50);
+    } else {
+      scrollToTarget();
     }
   };
 

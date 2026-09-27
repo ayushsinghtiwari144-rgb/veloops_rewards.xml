@@ -45,12 +45,22 @@ const GiveawayDetails = () => {
       try {
         const apiData = await fetchGiveawayByIdApi(slug);
         if (isMounted && apiData) {
-          currentGw = apiData.giveaway || apiData;
+          currentGw = apiData.giveaway || apiData.data || apiData;
           setGiveaway(currentGw);
         }
       } catch (err) {
-        if (isMounted) {
-          setGiveaway(null);
+        // Fallback: Check if slug matches current active giveaways
+        try {
+          const currentList = await fetchCurrentGiveawaysApi();
+          const match = currentList.find(g => g.slug === slug || g.id === slug || g._id === slug) || currentList[0];
+          if (isMounted && match) {
+            currentGw = match;
+            setGiveaway(currentGw);
+          }
+        } catch (fallbackErr) {
+          if (isMounted) {
+            setGiveaway(null);
+          }
         }
       }
 

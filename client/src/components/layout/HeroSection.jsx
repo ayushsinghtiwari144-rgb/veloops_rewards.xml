@@ -22,10 +22,26 @@ const HeroSection = () => {
             </p>
 
             <div className="d-flex flex-wrap align-items-center gap-3">
-              <a href="#featured-giveaways" className="btn btn-primary btn-lg px-4 py-3 fw-bold d-inline-flex align-items-center gap-2 shadow-sm">
+              <a
+                href="#featured-giveaways"
+                className="btn btn-primary btn-lg px-4 py-3 fw-bold d-inline-flex align-items-center gap-2 shadow-sm"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const elem = document.getElementById('featured-giveaways');
+                  if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+              >
                 Explore Giveaways <ArrowRight size={20} />
               </a>
-              <a href="#how-it-works" className="btn btn-outline-secondary btn-lg px-4 py-3 fw-semibold">
+              <a
+                href="#how-it-works"
+                className="btn btn-outline-secondary btn-lg px-4 py-3 fw-semibold"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const elem = document.getElementById('how-it-works');
+                  if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+              >
                 How It Works
               </a>
             </div>

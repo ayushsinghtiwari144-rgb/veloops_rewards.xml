@@ -67,7 +67,7 @@ const GiveawayCard = ({ giveaway }) => {
         </div>
 
         <Link
-          to={`/giveaway/${slug}`}
+          to={`/giveaway/${giveaway.id || giveaway._id || giveaway.slug}`}
           className="btn btn-primary w-100 py-2 fw-semibold d-flex align-items-center justify-content-center gap-2"
         >
           {status === 'ACTIVE' ? 'Join Now' : status === 'UPCOMING' ? 'Pre-Register' : 'View Winner Details'}

@@ -7,7 +7,11 @@ export { getStoredToken };
  */
 export const fetchCurrentGiveawaysApi = async () => {
   const data = await apiFetch('/giveaways/current');
-  return data.data || [];
+  const result = data?.data;
+  if (!result) return [];
+  if (Array.isArray(result)) return result;
+  if (typeof result === 'object') return [result];
+  return [];
 };
 
 /**
