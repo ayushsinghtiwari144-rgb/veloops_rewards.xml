@@ -16,6 +16,9 @@ router.get('/previous', giveawayController.getPreviousGiveaways);
 // GET /api/giveaways/previous/winners - Fetch historical public winners
 router.get('/previous/winners', giveawayController.getPreviousWinnersList);
 
+// ALL /api/giveaways/seed - Seed sample phone giveaways into MongoDB Atlas
+router.all('/seed', giveawayController.seedDatabase);
+
 // GET /api/giveaways/:id - Fetch giveaway details by ID or slug
 router.get('/:id', validateObjectId('id'), giveawayController.getGiveawayById);
 

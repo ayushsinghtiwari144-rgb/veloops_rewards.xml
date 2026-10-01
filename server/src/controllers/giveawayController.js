@@ -10,11 +10,40 @@ const { successResponse, errorResponse } = require('../utils/apiResponse');
  */
 const getCurrentGiveaways = async (req, res, next) => {
   try {
-    const giveaways = await giveawayService.getCurrentGiveaways();
+    let giveaways = await giveawayService.getCurrentGiveaways();
+    if (!giveaways || giveaways.length === 0) {
+      try {
+        const { autoSeedIfEmpty } = require('../../seed/seedGiveaways');
+        await autoSeedIfEmpty();
+        giveaways = await giveawayService.getCurrentGiveaways();
+      } catch (seedErr) {
+        console.error('[WARN] Auto-seed on current giveaways check failed:', seedErr.message);
+      }
+    }
+
     if (!giveaways || giveaways.length === 0) {
       return successResponse(res, [], 'No active giveaways found');
     }
     return successResponse(res, giveaways, 'Active giveaways retrieved successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * ALL /api/giveaways/seed
+ * Seed sample giveaways & phone prizes into MongoDB Atlas
+ */
+const seedDatabase = async (req, res, next) => {
+  try {
+    const { runSeeder } = require('../../seed/seedGiveaways');
+    const count = await runSeeder();
+    const activeGiveaways = await giveawayService.getCurrentGiveaways();
+    return successResponse(
+      res,
+      { seededCount: count, giveaways: activeGiveaways },
+      `Successfully seeded ${count} sample giveaways and phone prizes into database.`
+    );
   } catch (error) {
     next(error);
   }
@@ -188,6 +217,7 @@ const getMyClaim = async (req, res, next) => {
 
 module.exports = {
   getCurrentGiveaways,
+  seedDatabase,
   getPreviousGiveaways,
   getGiveawayById,
   getMyStatus,
