@@ -69,18 +69,23 @@ const FAQ = () => {
           {faqList.map((item) => {
             const isOpen = openFaq === item.id;
             return (
-              <div key={item.id} className={styles.faqItem}>
+              <div key={item.id} className={`${styles.faqItem} ${isOpen ? styles.faqItemOpen : ''}`}>
                 <button
                   type="button"
                   className={styles.faqQuestion}
                   onClick={() => toggleFaq(item.id)}
                   aria-expanded={isOpen}
+                  aria-controls={`answer-${item.id}`}
                 >
-                  <span>{item.q}</span>
-                  {isOpen ? <ChevronUp size={20} className="text-primary" /> : <ChevronDown size={20} className="text-muted" />}
+                  <span className="pe-3">{item.q}</span>
+                  {isOpen ? (
+                    <ChevronUp size={20} className="text-primary flex-shrink-0" />
+                  ) : (
+                    <ChevronDown size={20} className="text-muted flex-shrink-0" />
+                  )}
                 </button>
                 {isOpen && (
-                  <div className={styles.faqAnswer}>
+                  <div id={`answer-${item.id}`} className={styles.faqAnswer} role="region">
                     {item.a}
                   </div>
                 )}

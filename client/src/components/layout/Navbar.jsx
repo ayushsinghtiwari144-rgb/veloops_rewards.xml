@@ -20,6 +20,7 @@ const Navbar = () => {
 
   const handleAnchorClick = (e, targetId) => {
     e.preventDefault();
+    const wasMobileOpen = mobileOpen;
     closeMobileMenu();
 
     const doScroll = () => {
@@ -31,24 +32,28 @@ const Navbar = () => {
       }
     };
 
-    if (window.location.pathname !== '/') {
-      navigate('/', { replace: false });
-      let attempts = 0;
-      const interval = setInterval(() => {
-        const elem = document.getElementById(targetId);
-        attempts++;
-        if (elem) {
-          const yOffset = -80;
-          const y = elem.getBoundingClientRect().top + window.pageYOffset + yOffset;
-          window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
-          clearInterval(interval);
-        } else if (attempts > 15) {
-          clearInterval(interval);
-        }
-      }, 50);
-    } else {
-      doScroll();
-    }
+    const delay = wasMobileOpen ? 150 : 10;
+
+    setTimeout(() => {
+      if (window.location.pathname !== '/') {
+        navigate('/', { replace: false });
+        let attempts = 0;
+        const interval = setInterval(() => {
+          const elem = document.getElementById(targetId);
+          attempts++;
+          if (elem) {
+            const yOffset = -80;
+            const y = elem.getBoundingClientRect().top + window.pageYOffset + yOffset;
+            window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+            clearInterval(interval);
+          } else if (attempts > 20) {
+            clearInterval(interval);
+          }
+        }, 50);
+      } else {
+        doScroll();
+      }
+    }, delay);
   };
 
   return (

@@ -28,7 +28,10 @@ const HeroSection = () => {
                 onClick={(e) => {
                   e.preventDefault();
                   const elem = document.getElementById('featured-giveaways');
-                  if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  if (elem) {
+                    const y = elem.getBoundingClientRect().top + window.pageYOffset - 80;
+                    window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+                  }
                 }}
               >
                 Explore Giveaways <ArrowRight size={20} />
@@ -39,7 +42,10 @@ const HeroSection = () => {
                 onClick={(e) => {
                   e.preventDefault();
                   const elem = document.getElementById('how-it-works');
-                  if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  if (elem) {
+                    const y = elem.getBoundingClientRect().top + window.pageYOffset - 80;
+                    window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+                  }
                 }}
               >
                 How It Works
