@@ -9,7 +9,7 @@ const setAuthCookies = (res, refreshToken) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    maxAge: 7 * 24 * 60 * 60 * 1000
   });
 };
 
@@ -62,7 +62,6 @@ const login = async (req, res, next) => {
 
 /**
  * GET /api/auth/me
- * Protected endpoint returning current user profile
  */
 const me = async (req, res, next) => {
   try {
@@ -79,8 +78,20 @@ const me = async (req, res, next) => {
 };
 
 /**
+ * PUT /api/auth/profile
+ */
+const updateProfile = async (req, res, next) => {
+  try {
+    const { name, avatarUrl } = req.body;
+    const updatedUser = await authService.updateUserProfile(req.user._id, { name, avatarUrl });
+    return successResponse(res, { user: updatedUser }, 'Profile updated successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * POST /api/auth/logout
- * Invalidate refresh token cookie and session
  */
 const logout = async (req, res, next) => {
   try {
@@ -100,5 +111,6 @@ module.exports = {
   register,
   login,
   me,
+  updateProfile,
   logout
 };

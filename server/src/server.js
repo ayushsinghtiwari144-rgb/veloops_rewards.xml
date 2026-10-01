@@ -84,7 +84,7 @@ const startServer = async () => {
   const dbConnected = await connectDB();
   if (dbConnected) {
     try {
-      const { autoSeedIfEmpty } = require('../seed/seedGiveaways');
+      const { autoSeedIfEmpty } = require('../seed/seedHubData');
       await autoSeedIfEmpty();
     } catch (seedErr) {
       console.error('[WARN] Auto-seed execution failed:', seedErr.message);

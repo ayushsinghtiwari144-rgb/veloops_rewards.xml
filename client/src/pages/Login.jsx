@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { LogIn, Lock, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { LogIn, Lock, AlertCircle, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import Card from '../components/common/Card';
-import Button from '../components/common/Button';
 
-const Login = () => {
+export const Login = () => {
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -15,14 +13,13 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const from = location.state?.from?.pathname || '/account';
+  const from = location.state?.from?.pathname || '/';
 
-  // If already authenticated, redirect
-  React.useEffect(() => {
+  useEffect(() => {
     if (isAuthenticated) {
-      navigate('/account', { replace: true });
+      navigate(from, { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, from]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,15 +37,15 @@ const Login = () => {
   };
 
   return (
-    <div className="container py-5 d-flex justify-content-center">
+    <div className="container py-5 d-flex justify-content-center align-items-center" style={{ minHeight: '75vh' }}>
       <div style={{ maxWidth: '440px', width: '100%' }}>
-        <Card>
+        <div className="p-4 p-md-5 bg-dark border border-secondary text-white rounded-4 shadow-lg">
           <div className="text-center mb-4">
-            <div className="p-3 rounded-circle bg-primary bg-opacity-10 text-primary d-inline-flex mb-2">
-              <LogIn size={32} />
+            <div className="p-3 rounded-circle bg-indigo bg-opacity-20 text-indigo d-inline-flex mb-2">
+              <Sparkles size={32} />
             </div>
             <h3 className="fw-bold">Member Sign In</h3>
-            <p className="text-muted small">Sign in to manage your VELOOP Rewards account</p>
+            <p className="text-secondary small">Access your VELOOP Rewards Hub points & rewards</p>
           </div>
 
           {error && (
@@ -60,10 +57,10 @@ const Login = () => {
 
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label className="form-label font-semibold small">Email Address</label>
+              <label className="form-label text-secondary small">Email Address</label>
               <input
                 type="email"
-                className="form-control py-2"
+                className="form-control bg-dark-subtle border-secondary text-white py-2"
                 placeholder="user@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -72,10 +69,10 @@ const Login = () => {
             </div>
 
             <div className="mb-4">
-              <label className="form-label font-semibold small">Password</label>
+              <label className="form-label text-secondary small">Password</label>
               <input
                 type="password"
-                className="form-control py-2"
+                className="form-control bg-dark-subtle border-secondary text-white py-2"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -83,31 +80,30 @@ const Login = () => {
               />
             </div>
 
-            <Button
+            <button
               type="submit"
-              variant="primary"
-              className="w-100 py-2 fw-bold d-flex align-items-center justify-content-center gap-2"
+              className="btn btn-indigo w-100 py-2.5 fw-bold rounded-3 d-flex align-items-center justify-content-center gap-2"
               disabled={loading}
             >
               {loading ? (
-                'Logging in...'
+                'Signing In...'
               ) : (
                 <>
                   <Lock size={18} /> Sign In
                 </>
               )}
-            </Button>
+            </button>
           </form>
 
-          <hr className="my-4" />
+          <hr className="border-secondary my-4" />
 
-          <div className="text-center small text-muted">
+          <div className="text-center small text-secondary">
             Don't have an account yet?{' '}
-            <Link to="/register" className="fw-semibold text-primary">
-              Create Free Account
+            <Link to="/register" className="fw-semibold text-indigo">
+              Create Free Account (+500 VE Points)
             </Link>
           </div>
-        </Card>
+        </div>
       </div>
     </div>
   );

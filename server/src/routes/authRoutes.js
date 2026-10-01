@@ -1,21 +1,14 @@
 const express = require('express');
 const authController = require('../controllers/authController');
 const { requireAuth } = require('../middleware/authMiddleware');
-const { validateRegisterInput, validateLoginInput } = require('../middleware/authValidationMiddleware');
-const { authLimiter } = require('../middleware/rateLimitMiddleware');
+const { validateRegister, validateLogin, validateInput } = require('../middleware/authValidationMiddleware');
 
 const router = express.Router();
 
-// POST /api/auth/register
-router.post('/register', authLimiter, validateRegisterInput, authController.register);
-
-// POST /api/auth/login
-router.post('/login', authLimiter, validateLoginInput, authController.login);
-
-// GET /api/auth/me (Protected route)
+router.post('/register', validateRegister, validateInput, authController.register);
+router.post('/login', validateLogin, validateInput, authController.login);
 router.get('/me', requireAuth, authController.me);
-
-// POST /api/auth/logout
+router.put('/profile', requireAuth, authController.updateProfile);
 router.post('/logout', authController.logout);
 
 module.exports = router;

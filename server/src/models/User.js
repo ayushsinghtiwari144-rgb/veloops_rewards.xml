@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema(
     passwordHash: {
       type: String,
       required: [true, 'Password hash is required'],
-      select: false // Never return passwordHash in queries by default
+      select: false
     },
     role: {
       type: String,
@@ -37,6 +37,29 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 500,
       min: 0
+    },
+    level: {
+      type: Number,
+      default: 1,
+      min: 1
+    },
+    xp: {
+      type: Number,
+      default: 100,
+      min: 0
+    },
+    streakDays: {
+      type: Number,
+      default: 1,
+      min: 0
+    },
+    lastLoginDate: {
+      type: Date,
+      default: Date.now
+    },
+    avatarUrl: {
+      type: String,
+      default: ''
     }
   },
   {
@@ -44,8 +67,9 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Method to format public safe user JSON representation
+// Helper method to format safe public user JSON
 userSchema.methods.toSafeObject = function () {
+  const nextLevelXp = this.level * 500;
   return {
     id: this._id.toString(),
     name: this.name,
@@ -53,6 +77,12 @@ userSchema.methods.toSafeObject = function () {
     role: this.role,
     status: this.status,
     pointsBalance: this.pointsBalance,
+    level: this.level,
+    xp: this.xp,
+    nextLevelXp,
+    streakDays: this.streakDays,
+    lastLoginDate: this.lastLoginDate,
+    avatarUrl: this.avatarUrl,
     createdAt: this.createdAt
   };
 };

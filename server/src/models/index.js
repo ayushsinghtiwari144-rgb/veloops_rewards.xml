@@ -1,23 +1,25 @@
 const User = require('./User');
-const Giveaway = require('./Giveaway');
-const Prize = require('./Prize');
-const GiveawayPrize = require('./GiveawayPrize');
-const GiveawayParticipation = require('./GiveawayParticipation');
-const GiveawayEntryTransaction = require('./GiveawayEntryTransaction');
-const GiveawayWinner = require('./GiveawayWinner');
-const PrizeClaim = require('./PrizeClaim');
-const FraudEvent = require('./FraudEvent');
+const Reward = require('./Reward');
+const Challenge = require('./Challenge');
+const UserChallenge = require('./UserChallenge');
+const Achievement = require('./Achievement');
+const UserAchievement = require('./UserAchievement');
+const PointsTransaction = require('./PointsTransaction');
+const RewardRedemption = require('./RewardRedemption');
+const Notification = require('./Notification');
 const AuditLog = require('./AuditLog');
+const FraudEvent = require('./FraudEvent');
 
 module.exports = {
   User,
-  Giveaway,
-  Prize,
-  GiveawayPrize,
-  GiveawayParticipation,
-  GiveawayEntryTransaction,
-  GiveawayWinner,
-  PrizeClaim,
-  FraudEvent,
-  AuditLog
+  Reward,
+  Challenge,
+  UserChallenge,
+  Achievement,
+  UserAchievement,
+  PointsTransaction,
+  RewardRedemption,
+  Notification,
+  AuditLog,
+  FraudEvent
 };

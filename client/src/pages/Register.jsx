@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { UserPlus, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { UserPlus, AlertCircle, Sparkles, Coins } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import Card from '../components/common/Card';
-import Button from '../components/common/Button';
 
-const Register = () => {
+export const Register = () => {
   const { register, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -16,10 +14,9 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // If already authenticated, redirect
-  React.useEffect(() => {
+  useEffect(() => {
     if (isAuthenticated) {
-      navigate('/account', { replace: true });
+      navigate('/', { replace: true });
     }
   }, [isAuthenticated, navigate]);
 
@@ -41,7 +38,7 @@ const Register = () => {
 
     try {
       await register({ name, email, password });
-      navigate('/account', { replace: true });
+      navigate('/', { replace: true });
     } catch (err) {
       setError(err.message || 'Registration failed. Please check details.');
     } finally {
@@ -50,15 +47,18 @@ const Register = () => {
   };
 
   return (
-    <div className="container py-5 d-flex justify-content-center">
+    <div className="container py-5 d-flex justify-content-center align-items-center" style={{ minHeight: '80vh' }}>
       <div style={{ maxWidth: '480px', width: '100%' }}>
-        <Card>
+        <div className="p-4 p-md-5 bg-dark border border-secondary text-white rounded-4 shadow-lg">
           <div className="text-center mb-4">
-            <div className="p-3 rounded-circle bg-primary bg-opacity-10 text-primary d-inline-flex mb-2">
+            <div className="p-3 rounded-circle bg-indigo bg-opacity-20 text-indigo d-inline-flex mb-2">
               <UserPlus size={32} />
             </div>
             <h3 className="fw-bold">Create Free Account</h3>
-            <p className="text-muted small">Join VELOOP Rewards to participate in giveaways</p>
+            <p className="text-secondary small mb-2">Join VELOOP Rewards Hub platform</p>
+            <span className="badge bg-warning text-dark font-weight-bold px-3 py-1.5 rounded-pill">
+              <Coins size={14} className="me-1" /> Get +500 VE Starter Points
+            </span>
           </div>
 
           {error && (
@@ -70,11 +70,11 @@ const Register = () => {
 
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label className="form-label font-semibold small">Full Name</label>
+              <label className="form-label text-secondary small">Full Name</label>
               <input
                 type="text"
-                className="form-control py-2"
-                placeholder="John Doe"
+                className="form-control bg-dark-subtle border-secondary text-white py-2"
+                placeholder="Ayush Tiwari"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -82,10 +82,10 @@ const Register = () => {
             </div>
 
             <div className="mb-3">
-              <label className="form-label font-semibold small">Email Address</label>
+              <label className="form-label text-secondary small">Email Address</label>
               <input
                 type="email"
-                className="form-control py-2"
+                className="form-control bg-dark-subtle border-secondary text-white py-2"
                 placeholder="user@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -94,10 +94,10 @@ const Register = () => {
             </div>
 
             <div className="mb-3">
-              <label className="form-label font-semibold small">Password (Min 6 characters)</label>
+              <label className="form-label text-secondary small">Password (Min 6 characters)</label>
               <input
                 type="password"
-                className="form-control py-2"
+                className="form-control bg-dark-subtle border-secondary text-white py-2"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -106,10 +106,10 @@ const Register = () => {
             </div>
 
             <div className="mb-4">
-              <label className="form-label font-semibold small">Confirm Password</label>
+              <label className="form-label text-secondary small">Confirm Password</label>
               <input
                 type="password"
-                className="form-control py-2"
+                className="form-control bg-dark-subtle border-secondary text-white py-2"
                 placeholder="••••••••"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -117,25 +117,24 @@ const Register = () => {
               />
             </div>
 
-            <Button
+            <button
               type="submit"
-              variant="primary"
-              className="w-100 py-2 fw-bold d-flex align-items-center justify-content-center gap-2"
+              className="btn btn-indigo w-100 py-2.5 fw-bold rounded-3 d-flex align-items-center justify-content-center gap-2"
               disabled={loading}
             >
-              {loading ? 'Creating Account...' : 'Create Account'}
-            </Button>
+              {loading ? 'Creating Account...' : 'Create Account & Claim +500 VE'}
+            </button>
           </form>
 
-          <hr className="my-4" />
+          <hr className="border-secondary my-4" />
 
-          <div className="text-center small text-muted">
+          <div className="text-center small text-secondary">
             Already have an account?{' '}
-            <Link to="/login" className="fw-semibold text-primary">
+            <Link to="/login" className="fw-semibold text-indigo">
               Sign In Here
             </Link>
           </div>
-        </Card>
+        </div>
       </div>
     </div>
   );
