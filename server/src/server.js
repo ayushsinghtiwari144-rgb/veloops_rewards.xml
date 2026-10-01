@@ -82,7 +82,14 @@ const startServer = async () => {
   
   // Connect to MongoDB
   const dbConnected = await connectDB();
-  if (!dbConnected) {
+  if (dbConnected) {
+    try {
+      const { autoSeedIfEmpty } = require('../seed/seedGiveaways');
+      await autoSeedIfEmpty();
+    } catch (seedErr) {
+      console.error('[WARN] Auto-seed execution failed:', seedErr.message);
+    }
+  } else {
     console.warn('[WARN] Server starting without active MongoDB connection. Database status is monitored on /api/health.');
   }
 
