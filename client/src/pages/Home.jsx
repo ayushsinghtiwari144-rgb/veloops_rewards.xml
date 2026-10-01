@@ -85,7 +85,7 @@ const Home = () => {
             </div>
           ) : giveaways.length === 0 ? (
             <div className="text-center py-5 bg-light rounded-4 border">
-              <h5 className="fw-bold text-secondary mb-2">No Active Giveaways Right Now</h5>
+              <h5 className="fw-bold text-secondary mb-2">No giveaways available right now</h5>
               <p className="text-muted small mb-0">
                 Check back soon! New rewards and giveaways are added regularly.
               </p>
