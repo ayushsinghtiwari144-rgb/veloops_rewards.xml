@@ -1,33 +1,47 @@
 const mongoose = require('mongoose');
 const config = require('./env');
 
-let isConnected = false;
+let cached = global.mongooseCached;
+if (!cached) {
+  cached = global.mongooseCached = { conn: null, promise: null };
+}
 
 const connectDB = async () => {
-  if (!config.mongoUri) {
+  const mongoUri = process.env.MONGO_URI || config.mongoUri;
+  if (!mongoUri) {
     console.warn('[WARN] Database Connection: MONGO_URI is not set in environment.');
-    isConnected = false;
     return false;
   }
 
-  try {
-    const conn = await mongoose.connect(config.mongoUri, {
-      serverSelectionTimeoutMS: 5000 // 5 sec timeout for local/remote DB check
-    });
+  if (cached.conn && mongoose.connection.readyState === 1) {
+    return true;
+  }
 
-    isConnected = true;
-    console.log(`[INFO] MongoDB Connected: ${conn.connection.host} / ${conn.connection.name}`);
+  if (!cached.promise) {
+    const opts = {
+      bufferCommands: false,
+      serverSelectionTimeoutMS: 8000
+    };
+    cached.promise = mongoose.connect(mongoUri, opts).then((m) => {
+      console.log(`[INFO] MongoDB Connected: ${m.connection.host} / ${m.connection.name}`);
+      return m;
+    }).catch((err) => {
+      cached.promise = null;
+      console.error(`[ERROR] MongoDB Connection Failure: ${err.message}`);
+      throw err;
+    });
+  }
+
+  try {
+    cached.conn = await cached.promise;
     return true;
   } catch (error) {
-    isConnected = false;
-    console.error(`[ERROR] MongoDB Connection Failure: ${error.message}`);
     return false;
   }
 };
 
 const getDbStatus = () => {
-  // Mongoose connection state: 1 = connected
-  return mongoose.connection.readyState === 1 || isConnected ? 'connected' : 'disconnected';
+  return mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
 };
 
 module.exports = {
