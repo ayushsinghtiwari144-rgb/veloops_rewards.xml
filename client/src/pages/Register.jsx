@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { UserPlus, AlertCircle, Sparkles, Coins } from 'lucide-react';
+import { UserPlus, AlertCircle, Coins } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const Register = () => {
@@ -49,15 +49,15 @@ export const Register = () => {
   return (
     <div className="container py-5 d-flex justify-content-center align-items-center" style={{ minHeight: '80vh' }}>
       <div style={{ maxWidth: '480px', width: '100%' }}>
-        <div className="p-4 p-md-5 bg-dark border border-secondary text-white rounded-4 shadow-lg">
+        <div className="card-saas p-4 p-md-5">
           <div className="text-center mb-4">
-            <div className="p-3 rounded-circle bg-indigo bg-opacity-20 text-indigo d-inline-flex mb-2">
+            <div className="p-3 rounded-circle bg-primary-light text-primary d-inline-flex mb-2">
               <UserPlus size={32} />
             </div>
-            <h3 className="fw-bold">Create Free Account</h3>
-            <p className="text-secondary small mb-2">Join VELOOP Rewards Hub platform</p>
-            <span className="badge bg-warning text-dark font-weight-bold px-3 py-1.5 rounded-pill">
-              <Coins size={14} className="me-1" /> Get +500 VE Starter Points
+            <h3 className="font-weight-bold text-dark">Create Free Account</h3>
+            <p className="text-muted small mb-2">Join VELOOP Rewards Hub platform</p>
+            <span className="badge badge-gold px-3 py-1.5 rounded-pill">
+              <Coins size={14} className="me-1" /> Get +100 VE Starter Points
             </span>
           </div>
 
@@ -70,10 +70,10 @@ export const Register = () => {
 
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label className="form-label text-secondary small">Full Name</label>
+              <label className="form-label text-muted small font-weight-medium">Full Name</label>
               <input
                 type="text"
-                className="form-control bg-dark-subtle border-secondary text-white py-2"
+                className="form-control border py-2 text-dark"
                 placeholder="Ayush Tiwari"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -82,10 +82,10 @@ export const Register = () => {
             </div>
 
             <div className="mb-3">
-              <label className="form-label text-secondary small">Email Address</label>
+              <label className="form-label text-muted small font-weight-medium">Email Address</label>
               <input
                 type="email"
-                className="form-control bg-dark-subtle border-secondary text-white py-2"
+                className="form-control border py-2 text-dark"
                 placeholder="user@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -94,10 +94,10 @@ export const Register = () => {
             </div>
 
             <div className="mb-3">
-              <label className="form-label text-secondary small">Password (Min 6 characters)</label>
+              <label className="form-label text-muted small font-weight-medium">Password (Min 6 characters)</label>
               <input
                 type="password"
-                className="form-control bg-dark-subtle border-secondary text-white py-2"
+                className="form-control border py-2 text-dark"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -106,10 +106,10 @@ export const Register = () => {
             </div>
 
             <div className="mb-4">
-              <label className="form-label text-secondary small">Confirm Password</label>
+              <label className="form-label text-muted small font-weight-medium">Confirm Password</label>
               <input
                 type="password"
-                className="form-control bg-dark-subtle border-secondary text-white py-2"
+                className="form-control border py-2 text-dark"
                 placeholder="••••••••"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -119,18 +119,18 @@ export const Register = () => {
 
             <button
               type="submit"
-              className="btn btn-indigo w-100 py-2.5 fw-bold rounded-3 d-flex align-items-center justify-content-center gap-2"
+              className="btn btn-indigo w-100 py-2.5 font-weight-bold rounded-3 d-flex align-items-center justify-content-center gap-2"
               disabled={loading}
             >
-              {loading ? 'Creating Account...' : 'Create Account & Claim +500 VE'}
+              {loading ? 'Creating Account...' : 'Create Account & Claim Points'}
             </button>
           </form>
 
-          <hr className="border-secondary my-4" />
+          <hr className="my-4 border-light" />
 
-          <div className="text-center small text-secondary">
+          <div className="text-center small text-muted">
             Already have an account?{' '}
-            <Link to="/login" className="fw-semibold text-indigo">
+            <Link to="/login" className="font-weight-semibold text-primary">
               Sign In Here
             </Link>
           </div>

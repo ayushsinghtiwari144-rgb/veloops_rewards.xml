@@ -6,25 +6,13 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/veloop_rew
 
 const sampleRewards = [
   {
-    title: 'Apple iPhone 15 Pro (256GB)',
-    slug: 'iphone-15-pro-256gb',
-    description: 'Aerospace-grade titanium design with A17 Pro chip and Super Retina XDR display.',
-    category: 'ELECTRONICS',
-    pointsRequired: 15000,
-    stock: 5,
-    imageUrl: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=600&auto=format&fit=crop&q=80',
-    itemType: 'PHYSICAL',
-    status: 'ACTIVE',
-    featured: true
-  },
-  {
-    title: 'Samsung Galaxy S24 Ultra (512GB)',
-    slug: 'samsung-s24-ultra-512gb',
-    description: 'Galaxy AI innovation with Snapdragon 8 Gen 3 and 200MP camera system.',
-    category: 'ELECTRONICS',
-    pointsRequired: 18000,
-    stock: 4,
-    imageUrl: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=600&auto=format&fit=crop&q=80',
+    title: 'Sony WF-1000XM5 Wireless Earbuds',
+    slug: 'sony-wf1000xm5-earbuds',
+    description: 'Industry-leading noise canceling with High-Resolution Audio Wireless support.',
+    category: 'AUDIO',
+    pointsRequired: 2500,
+    stock: 15,
+    imageUrl: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&auto=format&fit=crop&q=80',
     itemType: 'PHYSICAL',
     status: 'ACTIVE',
     featured: true
@@ -34,7 +22,7 @@ const sampleRewards = [
     slug: 'apple-watch-series-9',
     description: 'Advanced health metrics, Double Tap gesture control, and bright always-on display.',
     category: 'WEARABLES',
-    pointsRequired: 8000,
+    pointsRequired: 4200,
     stock: 8,
     imageUrl: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600&auto=format&fit=crop&q=80',
     itemType: 'PHYSICAL',
@@ -42,26 +30,50 @@ const sampleRewards = [
     featured: true
   },
   {
-    title: 'Sony WF-1000XM5 Wireless Earbuds',
-    slug: 'sony-wf1000xm5-earbuds',
-    description: 'Industry-leading noise canceling with High-Resolution Audio Wireless support.',
-    category: 'AUDIO',
-    pointsRequired: 5000,
-    stock: 12,
-    imageUrl: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&auto=format&fit=crop&q=80',
-    itemType: 'PHYSICAL',
-    status: 'ACTIVE',
-    featured: false
-  },
-  {
     title: '$50 Amazon E-Gift Card',
     slug: 'amazon-gift-card-50',
     description: 'Instant digital code redeemable for millions of products on Amazon.',
     category: 'GIFT_CARDS',
-    pointsRequired: 2500,
+    pointsRequired: 1500,
     stock: 50,
     imageUrl: 'https://images.unsplash.com/photo-1556742049-0a67daf4095a?w=600&auto=format&fit=crop&q=80',
     itemType: 'DIGITAL',
+    status: 'ACTIVE',
+    featured: true
+  },
+  {
+    title: 'MagSafe Wireless Charging Stand',
+    slug: 'magsafe-wireless-charging-stand',
+    description: '15W fast magnetic charging stand for smartphone, wireless earbuds, and watch.',
+    category: 'ACCESSORIES',
+    pointsRequired: 1200,
+    stock: 25,
+    imageUrl: 'https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=600&auto=format&fit=crop&q=80',
+    itemType: 'PHYSICAL',
+    status: 'ACTIVE',
+    featured: true
+  },
+  {
+    title: 'VELOOP Premium Tech Hoodie & Cap Set',
+    slug: 'veloop-tech-hoodie-cap-set',
+    description: 'Ultra-soft fleece embroidered hoodie paired with custom VELOOP snapback cap.',
+    category: 'MERCHANDISE',
+    pointsRequired: 3000,
+    stock: 20,
+    imageUrl: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=600&auto=format&fit=crop&q=80',
+    itemType: 'PHYSICAL',
+    status: 'ACTIVE',
+    featured: true
+  },
+  {
+    title: 'Apple iPhone 15 Pro (256GB)',
+    slug: 'iphone-15-pro-256gb',
+    description: 'Aerospace-grade titanium design with A17 Pro chip and Super Retina XDR display.',
+    category: 'ELECTRONICS',
+    pointsRequired: 15000,
+    stock: 5,
+    imageUrl: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=600&auto=format&fit=crop&q=80',
+    itemType: 'PHYSICAL',
     status: 'ACTIVE',
     featured: true
   },
@@ -88,18 +100,6 @@ const sampleRewards = [
     itemType: 'PHYSICAL',
     status: 'ACTIVE',
     featured: true
-  },
-  {
-    title: 'Razer BlackWidow V4 Pro Mechanical Keyboard',
-    slug: 'razer-blackwidow-v4-pro',
-    description: 'Command dial, dedicated macro keys, and customizable Chroma RGB per key.',
-    category: 'GAMING',
-    pointsRequired: 4000,
-    stock: 10,
-    imageUrl: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&auto=format&fit=crop&q=80',
-    itemType: 'PHYSICAL',
-    status: 'ACTIVE',
-    featured: false
   }
 ];
 

@@ -22,7 +22,7 @@ const rewardSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      enum: ['ELECTRONICS', 'GIFT_CARDS', 'WEARABLES', 'AUDIO', 'GAMING', 'OTHER'],
+      enum: ['ELECTRONICS', 'GIFT_CARDS', 'WEARABLES', 'AUDIO', 'GAMING', 'ACCESSORIES', 'MERCHANDISE', 'OTHER'],
       default: 'ELECTRONICS',
       index: true
     },

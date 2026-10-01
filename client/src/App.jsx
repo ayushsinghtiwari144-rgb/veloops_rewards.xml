@@ -31,7 +31,7 @@ function App() {
     <AuthProvider>
       <Router>
         <ScrollToTop />
-        <div className="app-wrapper min-vh-100 d-flex flex-column bg-dark text-white">
+        <div className="app-wrapper min-vh-100 d-flex flex-column">
           <Navbar />
           <main className="content-container flex-grow-1">
             <Routes>

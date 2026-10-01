@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { LogIn, Lock, AlertCircle, Sparkles } from 'lucide-react';
+import { Lock, AlertCircle, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const Login = () => {
@@ -39,13 +39,13 @@ export const Login = () => {
   return (
     <div className="container py-5 d-flex justify-content-center align-items-center" style={{ minHeight: '75vh' }}>
       <div style={{ maxWidth: '440px', width: '100%' }}>
-        <div className="p-4 p-md-5 bg-dark border border-secondary text-white rounded-4 shadow-lg">
+        <div className="card-saas p-4 p-md-5">
           <div className="text-center mb-4">
-            <div className="p-3 rounded-circle bg-indigo bg-opacity-20 text-indigo d-inline-flex mb-2">
+            <div className="p-3 rounded-circle bg-primary-light text-primary d-inline-flex mb-2">
               <Sparkles size={32} />
             </div>
-            <h3 className="fw-bold">Member Sign In</h3>
-            <p className="text-secondary small">Access your VELOOP Rewards Hub points & rewards</p>
+            <h3 className="font-weight-bold text-dark">Member Sign In</h3>
+            <p className="text-muted small">Access your VELOOP Rewards Hub points & rewards</p>
           </div>
 
           {error && (
@@ -57,10 +57,10 @@ export const Login = () => {
 
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label className="form-label text-secondary small">Email Address</label>
+              <label className="form-label text-muted small font-weight-medium">Email Address</label>
               <input
                 type="email"
-                className="form-control bg-dark-subtle border-secondary text-white py-2"
+                className="form-control border py-2 text-dark"
                 placeholder="user@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -69,10 +69,10 @@ export const Login = () => {
             </div>
 
             <div className="mb-4">
-              <label className="form-label text-secondary small">Password</label>
+              <label className="form-label text-muted small font-weight-medium">Password</label>
               <input
                 type="password"
-                className="form-control bg-dark-subtle border-secondary text-white py-2"
+                className="form-control border py-2 text-dark"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -82,7 +82,7 @@ export const Login = () => {
 
             <button
               type="submit"
-              className="btn btn-indigo w-100 py-2.5 fw-bold rounded-3 d-flex align-items-center justify-content-center gap-2"
+              className="btn btn-indigo w-100 py-2.5 font-weight-bold rounded-3 d-flex align-items-center justify-content-center gap-2"
               disabled={loading}
             >
               {loading ? (
@@ -95,12 +95,12 @@ export const Login = () => {
             </button>
           </form>
 
-          <hr className="border-secondary my-4" />
+          <hr className="my-4 border-light" />
 
-          <div className="text-center small text-secondary">
+          <div className="text-center small text-muted">
             Don't have an account yet?{' '}
-            <Link to="/register" className="fw-semibold text-indigo">
-              Create Free Account (+500 VE Points)
+            <Link to="/register" className="font-weight-semibold text-primary">
+              Create Free Account (+100 VE Points)
             </Link>
           </div>
         </div>
