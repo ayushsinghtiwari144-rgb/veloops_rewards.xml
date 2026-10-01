@@ -1,12 +1,12 @@
 const express = require('express');
 const adminController = require('../controllers/adminController');
 const { requireAuth } = require('../middleware/authMiddleware');
-const { requireAdmin } = require('../middleware/authorizationMiddleware');
+const { requireRole } = require('../middleware/authorizationMiddleware');
 
 const router = express.Router();
 
 // Apply auth & admin guard to all admin routes
-router.use(requireAuth, requireAdmin);
+router.use(requireAuth, requireRole('ADMIN'));
 
 router.get('/stats', adminController.getAdminStats);
 router.post('/rewards', adminController.createReward);
