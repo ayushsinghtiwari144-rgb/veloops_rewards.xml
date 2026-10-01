@@ -6,12 +6,19 @@ export { getStoredToken };
  * Fetch active giveaways from API
  */
 export const fetchCurrentGiveawaysApi = async () => {
-  const data = await apiFetch('/giveaways/current');
-  const result = data?.data;
-  if (!result) return [];
-  if (Array.isArray(result)) return result;
-  if (typeof result === 'object') return [result];
-  return [];
+  try {
+    const data = await apiFetch('/giveaways/current');
+    const result = data?.data;
+    if (!result) return [];
+    if (Array.isArray(result)) return result;
+    if (typeof result === 'object') return [result];
+    return [];
+  } catch (err) {
+    if (err.code === 'GIVEAWAY_NOT_FOUND' || err.status === 404) {
+      return [];
+    }
+    throw err;
+  }
 };
 
 /**

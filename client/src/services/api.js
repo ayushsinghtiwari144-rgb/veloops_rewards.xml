@@ -48,6 +48,8 @@ export const apiFetch = async (endpoint, options = {}) => {
     ? endpoint
     : `${baseUrl}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
 
+  console.log("GIVEAWAY API URL:", url);
+
   let response;
   try {
     response = await fetch(url, {
@@ -61,6 +63,8 @@ export const apiFetch = async (endpoint, options = {}) => {
     throw error;
   }
 
+  console.log("GIVEAWAY API STATUS:", response.status);
+
   let data = null;
   try {
     data = await response.json();
@@ -68,11 +72,13 @@ export const apiFetch = async (endpoint, options = {}) => {
     // Non-JSON or empty response body
   }
 
+  console.log("GIVEAWAY API RESPONSE:", data);
+
   if (!response.ok || (data && data.success === false)) {
-    const errorMsg = data?.message || `HTTP error! Status: ${response.status}`;
+    const errorMsg = data?.message || data?.error?.message || `HTTP error! Status: ${response.status}`;
     const error = new Error(errorMsg);
     error.status = response.status;
-    error.code = data?.code || (response.status === 401 ? 'UNAUTHORIZED' : response.status === 403 ? 'FORBIDDEN' : 'API_ERROR');
+    error.code = data?.code || data?.error?.code || (response.status === 401 ? 'UNAUTHORIZED' : response.status === 403 ? 'FORBIDDEN' : 'API_ERROR');
     error.data = data;
     throw error;
   }
