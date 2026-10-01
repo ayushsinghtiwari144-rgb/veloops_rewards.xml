@@ -8,7 +8,7 @@ A modern, responsive and interactive rewards platform designed to provide users 
 
 ## 💻 GitHub Repository
 
-👉 [View Source Code](https://github.com/ayushsinghtiwari144-rgb/veloops_rewards)
+👉 https://github.com/ayushsinghtiwari144-rgb/veloops_rewards.xml
 
 ---
 
