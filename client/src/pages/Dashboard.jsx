@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
   getRewardsApi,
@@ -20,24 +20,21 @@ import {
   ArrowRight,
   ShoppingBag,
   TrendingUp,
-  CalendarCheck,
   Target,
   Users,
   Shield,
-  Clock,
   ChevronDown,
   ChevronUp,
   Lock,
-  Smartphone,
-  Watch,
-  Headphones,
+  Search,
   Check,
-  AlertCircle,
-  HelpCircle,
   Star,
   Activity,
   Layers,
-  Search
+  ArrowUpRight,
+  Play,
+  Bookmark,
+  AlertCircle
 } from 'lucide-react';
 
 export const Dashboard = () => {
@@ -52,16 +49,15 @@ export const Dashboard = () => {
   const [achievements, setAchievements] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Filter States
+  // Search & Filter States
   const [selectedRewardCategory, setSelectedRewardCategory] = useState('ALL');
-  const [challengeTab, setChallengeTab] = useState('DAILY'); // DAILY or WEEKLY
-  const [leaderboardTab, setLeaderboardTab] = useState('WEEKLY'); // WEEKLY or MONTHLY
+  const [rewardSearchQuery, setRewardSearchQuery] = useState('');
+  const [activeWorkStep, setActiveWorkStep] = useState(0);
 
   // FAQ Accordion State
   const [openFaqIndex, setOpenFaqIndex] = useState(0);
 
-  // Modals
-  const [activeEarnModal, setActiveEarnModal] = useState(null);
+  // Modals & Claim States
   const [redeemingReward, setRedeemingReward] = useState(null);
   const [shippingAddress, setShippingAddress] = useState('');
   const [redeemSuccess, setRedeemSuccess] = useState(null);
@@ -69,7 +65,7 @@ export const Dashboard = () => {
   const [claimingId, setClaimingId] = useState(null);
   const [claimMessage, setClaimMessage] = useState('');
 
-  // Handle scroll to section passed from navigation state
+  // Smooth scroll handler from location state
   useEffect(() => {
     if (location.state?.scrollTo) {
       const el = document.getElementById(location.state.scrollTo);
@@ -81,13 +77,13 @@ export const Dashboard = () => {
     }
   }, [location.state]);
 
-  const loadData = async () => {
+  const loadHubData = async () => {
     setLoading(true);
     try {
       const [rewardsData, challengesData, leaderboardData, achievementsData] = await Promise.all([
         getRewardsApi(),
         getChallengesApi(),
-        getLeaderboardApi(leaderboardTab.toLowerCase()),
+        getLeaderboardApi('weekly'),
         getAchievementsApi()
       ]);
       setRewards(rewardsData || []);
@@ -102,8 +98,8 @@ export const Dashboard = () => {
   };
 
   useEffect(() => {
-    loadData();
-  }, [leaderboardTab]);
+    loadHubData();
+  }, []);
 
   const handleClaimChallenge = async (challengeId) => {
     if (!isAuthenticated) {
@@ -116,7 +112,7 @@ export const Dashboard = () => {
       const result = await claimChallengeApi(challengeId);
       setClaimMessage(`🎉 Success! +${result.pointsAwarded} VE Points added to your balance.`);
       await refreshUser();
-      await loadData();
+      await loadHubData();
     } catch (err) {
       setClaimMessage(`⚠️ ${err.message || 'Failed to claim challenge'}`);
     } finally {
@@ -138,292 +134,102 @@ export const Dashboard = () => {
       const result = await redeemRewardApi(redeemingReward._id, { shippingAddress });
       setRedeemSuccess(result);
       await refreshUser();
-      await loadData();
+      await loadHubData();
     } catch (err) {
       setRedeemError(err.message || 'Redemption failed. Check your points balance.');
     }
   };
 
-  // Static Data for Sections
-  const waysToEarn = [
-    {
-      id: 'check-in',
-      icon: CalendarCheck,
-      title: 'Daily Check-in',
-      points: '+50 VE Pts',
-      badge: 'Daily',
-      description: 'Log into VELOOP Rewards Hub daily to collect instant point bonuses and build active login streaks.',
-      steps: [
-        'Log into your VELOOP account every 24 hours.',
-        'Navigate to the Daily Challenges section.',
-        'Click "Claim Points" on the Daily Login Reward card.',
-        'Build consecutive 7-day login streaks for bonus XP!'
-      ]
-    },
-    {
-      id: 'daily-challenges',
-      icon: Zap,
-      title: 'Daily Challenges',
-      points: '+100 - +200 VE Pts',
-      badge: 'Daily',
-      description: 'Complete quick daily activities like exploring the store, checking your rank, or updating settings.',
-      steps: [
-        'Check the Daily Challenges tab every morning.',
-        'Perform the requested action (e.g. view store or update profile).',
-        'Click "Claim Points" to receive instant credit.',
-        'Complete all daily tasks to maximize your daily point cap.'
-      ]
-    },
-    {
-      id: 'weekly-challenges',
-      icon: Target,
-      title: 'Weekly Challenges',
-      points: '+250 - +500 VE Pts',
-      badge: 'Weekly',
-      description: 'Tackle milestone objectives over 7-day cycles for massive point payouts and achievement progress.',
-      steps: [
-        'View active Weekly Challenges under the Challenges section.',
-        'Track your progress bar across the week.',
-        'Complete objectives like redeeming a reward or inviting friends.',
-        'Claim high-value point payouts before the weekly reset.'
-      ]
-    },
-    {
-      id: 'activity-completion',
-      icon: CheckCircle2,
-      title: 'Activity Completion',
-      points: '+150 VE Pts',
-      badge: 'Milestone',
-      description: 'Earn points by completing account verification, profile customization, and system milestones.',
-      steps: [
-        'Go to your Profile settings.',
-        'Fill out your contact details and shipping preferences.',
-        'Save your profile to trigger instant point verification.',
-        'Unlock initial explorer achievement badges.'
-      ]
-    },
-    {
-      id: 'referral-milestones',
-      icon: Users,
-      title: 'Referral Milestones',
-      points: '+250 VE Pts',
-      badge: 'Social',
-      description: 'Invite friends, family, and colleagues to join VELOOP and earn bonus points for every active referral.',
-      steps: [
-        'Share your unique referral link or invitation code with friends.',
-        'When your friend registers a free VELOOP account, bonus points are credited.',
-        'Earn +250 VE Points per friend invited.',
-        'Climb the monthly community referral leaderboard.'
-      ]
-    },
-    {
-      id: 'special-events',
-      icon: Sparkles,
-      title: 'Special Events',
-      points: 'Up to +1,000 VE Pts',
-      badge: 'Featured',
-      description: 'Participate in seasonal events, promotional campaigns, and limited-time point multiplier events.',
-      steps: [
-        'Watch for special banner announcements on VELOOP Rewards Hub.',
-        'Participate in promotional event windows.',
-        'Earn 2x point multipliers on select daily challenges.',
-        'Unlock exclusive limited-edition event badges.'
-      ]
-    }
+  // Section 6: Reward Journey Steps
+  const journeySteps = [
+    { key: 'start', title: 'START', icon: Sparkles, desc: 'Create account & collect 100 VE starter points.' },
+    { key: 'complete', title: 'COMPLETE', icon: Target, desc: 'Tackle daily missions & build login streaks.' },
+    { key: 'earn', title: 'EARN', icon: Coins, desc: 'Accumulate VE Points safely on your ledger.' },
+    { key: 'levelup', title: 'LEVEL UP', icon: TrendingUp, desc: 'Gain XP, rank up levels & unlock badges.' },
+    { key: 'redeem', title: 'REDEEM', icon: Gift, desc: 'Claim tech gadgets & instant digital cards.' }
   ];
 
-  const howItWorksSteps = [
-    {
-      number: '01',
-      title: 'Create Free Account',
-      description: 'Sign up in under 30 seconds with secure authentication. Receive 100 bonus VE Points upon registration.'
-    },
-    {
-      number: '02',
-      title: 'Complete Activities',
-      description: 'Check in daily, complete daily & weekly challenges, build streaks, and invite friends to earn XP.'
-    },
-    {
-      number: '03',
-      title: 'Earn VE Points',
-      description: 'Accumulate VE Points safely on your server-validated balance ledger with real-time tracking.'
-    },
-    {
-      number: '04',
-      title: 'Redeem Rewards',
-      description: 'Claim premium physical tech gadgets, accessories, or instant digital e-gift cards delivered to you.'
-    }
+  // Section 13: Platform Benefits Asymmetric Layout
+  const asymmetricBenefits = [
+    { icon: Activity, title: 'TRACK YOUR PROGRESS', desc: 'See your points balance, streaks, level progression, and achievement badges consolidated in one dashboard.', size: 'col-md-7' },
+    { icon: ShoppingBag, title: 'DISCOVER REWARDS', desc: 'Find tech gadgets, smart wearables, and gift cards built around your milestone progress.', size: 'col-md-5' },
+    { icon: Zap, title: 'COMPLETE CHALLENGES', desc: 'Turn daily activity tasks into measurable points and rank up faster on leaderboards.', size: 'col-md-5' },
+    { icon: Trophy, title: 'BUILD YOUR JOURNEY', desc: 'Progress through level tiers and collect exclusive unlockable achievement badges.', size: 'col-md-7' }
   ];
 
-  const platformBenefits = [
-    {
-      icon: Shield,
-      title: 'Secure Ledger',
-      description: 'Server-side point verification and token authentication prevent balance tampering and duplicate claims.'
-    },
-    {
-      icon: Activity,
-      title: 'Transparent Tracking',
-      description: 'Complete visibility into all earned and redeemed points with an immutable transaction audit log.'
-    },
-    {
-      icon: Smartphone,
-      title: 'Responsive Design',
-      description: 'Flawless experience tailored for all screen viewports from 320px mobile to 1920px desktop displays.'
-    },
-    {
-      icon: TrendingUp,
-      title: 'Activity Tracking',
-      description: 'Track your daily login streaks, total lifetime points earned, level XP, and achievement milestones.'
-    },
-    {
-      icon: ShoppingBag,
-      title: 'Reward Discovery',
-      description: 'Curated collection of wireless earbuds, smartwatches, fast chargers, gift cards, and merch.'
-    },
-    {
-      icon: Award,
-      title: 'Achievement System',
-      description: 'Unlockable badge tiers, level progression, and weekly leaderboard competitive rankings.'
-    }
+  // Section 14: Interactive How It Works Steps
+  const interactiveWorkSteps = [
+    { step: '01', title: 'Complete', desc: 'Engage with daily activity tasks, complete profile milestones, and maintain login streaks.', badge: 'Action Step' },
+    { step: '02', title: 'Earn', desc: 'Points are immediately credited to your account ledger with real-time balance updates.', badge: 'Point Ledger' },
+    { step: '03', title: 'Progress', desc: 'Accumulate XP to rank up levels, unlock achievement badges, and climb leaderboards.', badge: 'Level System' },
+    { step: '04', title: 'Redeem', desc: 'Browse available rewards and redeem physical items or instant digital gift codes.', badge: 'Fulfillment' }
   ];
 
-  const demoTestimonials = [
-    {
-      name: 'Alex Mercer',
-      role: 'Tech Enthusiast',
-      points: '14,500 VE Pts',
-      text: 'VELOOP Rewards Hub is super engaging! Completing daily challenges gave me enough points to redeem a wireless charger.',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
-    },
-    {
-      name: 'Sophia Patel',
-      role: 'Daily Explorer',
-      points: '8,200 VE Pts',
-      text: 'The daily streak system keeps me coming back every morning. Redeemed a $50 gift card seamlessly!',
-      avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80'
-    },
-    {
-      name: 'Marcus Chen',
-      role: 'Top Leaderboard Member',
-      points: '22,400 VE Pts',
-      text: 'Climbing the weekly leaderboard while unlocking achievement badges makes points earning feel like a game.',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80'
-    }
+  // Section 15: Example Reward Journeys (Sample Data)
+  const exampleJourneys = [
+    { name: 'Alex Mercer', role: 'Explorer Journey', path: 'Completed 5 challenges ➔ Earned 1,250 VE Points ➔ Unlocked Challenge Master', badge: 'Sample Member Journey' },
+    { name: 'Sophia Patel', role: 'Streak Journey', path: 'Logged in 7 consecutive days ➔ Earned 750 VE Points ➔ Redeemed Wireless Charger', badge: 'Sample Member Journey' },
+    { name: 'Marcus Chen', role: 'Collector Journey', path: 'Reached Level 4 Explorer ➔ Accumulated 4,200 VE Points ➔ Claimed Smart Watch', badge: 'Sample Member Journey' }
   ];
 
+  // Section 16: FAQ Items
   const faqItems = [
-    {
-      question: 'What are VE Points?',
-      answer: 'VE Points (VELOOP Ecosystem Points) are digital activity points earned by participating in challenges, maintaining login streaks, completing platform tasks, and unlocking achievements on VELOOP Rewards Hub.'
-    },
-    {
-      question: 'How can I earn points?',
-      answer: 'You can earn VE Points by logging in daily, completing daily and weekly challenges, inviting friends via referral milestones, updating your profile, and participating in seasonal community events.'
-    },
-    {
-      question: 'How do challenges work?',
-      answer: 'Challenges are action-based objectives (such as checking in or redeeming a reward) that reset daily or weekly. Once you complete the requirement, click "Claim Points" to instantly add VE Points to your balance and earn XP toward your next level.'
-    },
-    {
-      question: 'How do I redeem rewards?',
-      answer: 'Browse the Rewards Store, select any available physical merchandise or digital gift card, and click "Redeem". If you have sufficient VE Points, your redemption will be processed server-side, deducting points and generating your digital code or shipping order.'
-    },
-    {
-      question: 'Can I track my activity?',
-      answer: 'Yes! Your account includes a real-time Points History ledger, active streak counter, XP progress bar, and achievement unlock tracker available in your member dashboard.'
-    },
-    {
-      question: 'What happens if a reward is unavailable?',
-      answer: 'If a physical reward is temporarily out of stock, it will be marked as "Out of Stock" or "Limited Availability". Our inventory updates regularly, or you can choose from dozens of digital gift cards and other available reward items.'
-    }
+    { question: 'What are VE Points?', answer: 'VE Points (VELOOP Ecosystem Points) are digital activity points earned by participating in challenges, maintaining login streaks, completing platform tasks, and unlocking achievements on VELOOP Rewards Hub.' },
+    { question: 'How do challenges work?', answer: 'Challenges are action-based objectives (such as logging in or verifying your profile) that reset daily or weekly. Completing a challenge unlocks "Claim Points" to add VE Points and XP to your account.' },
+    { question: 'How do achievements work?', answer: 'Achievements are lifetime milestone badges awarded when you hit specific criteria, such as maintaining a 7-day streak, reaching 1,000 points, or redeeming your first store item.' },
+    { question: 'How can I find rewards?', answer: 'Explore the "Find Your Next Reward" section to browse physical gadgets, accessories, and digital gift cards. You can filter by category or search by item name.' },
+    { question: 'How is my progress calculated?', answer: 'Your progress is tracked server-side through XP earned from activities. Reaching XP thresholds automatically levels up your account status.' },
+    { question: 'Can I track my transactions?', answer: 'Yes! All point credits, challenge claims, and store redemptions are recorded in your personal Points Ledger & History page.' }
   ];
 
-  // Filtering Rewards
-  const filteredRewards = rewards.filter(r => {
-    if (selectedRewardCategory === 'ALL') return true;
-    return r.category === selectedRewardCategory;
+  // Sample Rewards fallback if API has empty response
+  const sampleRewardItems = [
+    { _id: 'earbuds-01', title: 'Wireless Earbuds (Active Noise Canceling)', pointsRequired: 2500, category: 'AUDIO', stock: 15, itemType: 'PHYSICAL', imageUrl: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&auto=format&fit=crop&q=80', description: 'Premium ANC wireless earbuds with high-resolution audio.' },
+    { _id: 'watch-01', title: 'Smart Fitness Watch Series 9', pointsRequired: 4200, category: 'WEARABLES', stock: 8, itemType: 'PHYSICAL', imageUrl: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600&auto=format&fit=crop&q=80', description: 'Advanced health metrics with always-on AMOLED display.' },
+    { _id: 'giftcard-01', title: '$50 Digital E-Gift Card', pointsRequired: 1500, category: 'GIFT_CARDS', stock: 50, itemType: 'DIGITAL', imageUrl: 'https://images.unsplash.com/photo-1556742049-0a67daf4095a?w=600&auto=format&fit=crop&q=80', description: 'Instant digital code redeemable on major shopping platforms.' },
+    { _id: 'charger-01', title: 'MagSafe Fast Wireless Charging Stand', pointsRequired: 1200, category: 'ACCESSORIES', stock: 25, itemType: 'PHYSICAL', imageUrl: 'https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=600&auto=format&fit=crop&q=80', description: '15W magnetic wireless charging stand for phone & earbuds.' },
+    { _id: 'hoodie-01', title: 'VELOOP Tech Hoodie & Cap Set', pointsRequired: 3000, category: 'MERCHANDISE', stock: 20, itemType: 'PHYSICAL', imageUrl: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=600&auto=format&fit=crop&q=80', description: 'Custom embroidered fleece hoodie paired with snapback cap.' }
+  ];
+
+  const effectiveRewards = rewards.length > 0 ? rewards : sampleRewardItems;
+
+  // Filter rewards by category and search query
+  const filteredRewards = effectiveRewards.filter(r => {
+    const matchesCategory = selectedRewardCategory === 'ALL' || r.category === selectedRewardCategory;
+    const matchesSearch = !rewardSearchQuery || r.title.toLowerCase().includes(rewardSearchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
   });
 
-  // Filtering Challenges
-  const filteredChallenges = challenges.filter(c => c.category === challengeTab);
-
-  // Requirement for required reward cards
-  const requiredSampleRewards = [
-    {
-      _id: 'sample-earbuds',
-      title: 'Wireless Earbuds (Sony WF-1000XM5)',
-      pointsRequired: 2500,
-      category: 'AUDIO',
-      stock: 15,
-      itemType: 'PHYSICAL',
-      imageUrl: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&auto=format&fit=crop&q=80',
-      description: 'Active Noise Canceling Wireless Earbuds with High-Res audio drivers.'
-    },
-    {
-      _id: 'sample-watch',
-      title: 'Smart Watch (Apple Watch Series 9)',
-      pointsRequired: 4200,
-      category: 'WEARABLES',
-      stock: 8,
-      itemType: 'PHYSICAL',
-      imageUrl: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600&auto=format&fit=crop&q=80',
-      description: 'Fitness & Health Smart Watch with always-on display and gesture controls.'
-    },
-    {
-      _id: 'sample-giftcard',
-      title: '$50 Digital E-Gift Card',
-      pointsRequired: 1500,
-      category: 'GIFT_CARDS',
-      stock: 50,
-      itemType: 'DIGITAL',
-      imageUrl: 'https://images.unsplash.com/photo-1556742049-0a67daf4095a?w=600&auto=format&fit=crop&q=80',
-      description: 'Instant digital code redeemable for shopping on major e-commerce platforms.'
-    },
-    {
-      _id: 'sample-accessories',
-      title: 'MagSafe Mobile Fast Wireless Charger',
-      pointsRequired: 1200,
-      category: 'ACCESSORIES',
-      stock: 25,
-      itemType: 'PHYSICAL',
-      imageUrl: 'https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=600&auto=format&fit=crop&q=80',
-      description: '15W fast magnetic wireless charger and desktop phone stand.'
-    },
-    {
-      _id: 'sample-merch',
-      title: 'VELOOP Premium Tech Hoodie & Cap',
-      pointsRequired: 3000,
-      category: 'MERCHANDISE',
-      stock: 20,
-      itemType: 'PHYSICAL',
-      imageUrl: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=600&auto=format&fit=crop&q=80',
-      description: 'Custom embroidered fleece tech hoodie and snapback cap set.'
-    }
-  ];
-
-  const displayRewards = filteredRewards.length > 0 ? filteredRewards : requiredSampleRewards;
+  // Calculate Next Reward Target Progress
+  const currentPoints = user?.pointsBalance || 3450;
+  const targetReward = effectiveRewards.find(r => r.pointsRequired > currentPoints) || effectiveRewards[0];
+  const targetCost = targetReward?.pointsRequired || 5000;
+  const progressPercent = Math.min(100, Math.floor((currentPoints / targetCost) * 100));
+  const pointsRemaining = Math.max(0, targetCost - currentPoints);
 
   return (
     <div className="pb-5">
-      {/* 1. HERO SECTION */}
+      {/* 3. HERO SECTION */}
       <section id="hero" className="py-5 position-relative overflow-hidden" style={{ background: 'linear-gradient(180deg, #eef2ff 0%, #f8fafc 100%)' }}>
         <div className="container py-4">
           <div className="row align-items-center g-5">
+            {/* Left Hero Content */}
             <div className="col-lg-6">
               <div className="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-pill bg-white border shadow-sm mb-3">
-                <span className="badge badge-gold">✨ VELOOP Rewards Platform</span>
-                <span className="small text-muted font-weight-medium">Points & Redemptions</span>
+                <span className="badge badge-gold">✨ VELOOP Command Center</span>
+                <span className="small text-muted font-weight-medium">Points & Progression Platform</span>
               </div>
+              
               <h1 className="display-4 font-weight-bold section-title mb-3 leading-tight">
-                Earn Points. <br />
-                Complete Challenges. <br />
+                Your Activities. <br />
+                Your Points. <br />
                 <span style={{ background: 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                  Unlock Rewards.
+                  Your Rewards.
                 </span>
               </h1>
+              
               <p className="lead text-muted mb-4 font-weight-normal fs-5" style={{ maxWidth: '520px' }}>
-                Join the VELOOP points and rewards ecosystem. Complete daily tasks, climb community leaderboards, accumulate VE Points, and redeem exclusive tech gadgets, gift cards, and merchandise.
+                Turn everyday progress into points, unlock achievements, and discover rewards built around your journey.
               </p>
 
               <div className="d-flex flex-wrap align-items-center gap-3">
@@ -431,15 +237,11 @@ export const Dashboard = () => {
                   type="button"
                   className="btn btn-indigo btn-lg px-4 font-weight-bold d-flex align-items-center gap-2"
                   onClick={() => {
-                    if (isAuthenticated) {
-                      const el = document.getElementById('challenges');
-                      if (el) el.scrollIntoView({ behavior: 'smooth' });
-                    } else {
-                      navigate('/register');
-                    }
+                    const el = document.getElementById('reward-discovery');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
                   }}
                 >
-                  <span>{isAuthenticated ? 'My Dashboard' : 'Get Started'}</span>
+                  <span>Explore Rewards</span>
                   <ArrowRight size={18} />
                 </button>
 
@@ -447,43 +249,55 @@ export const Dashboard = () => {
                   type="button"
                   className="btn btn-outline-indigo btn-lg px-4 font-weight-bold"
                   onClick={() => {
-                    const el = document.getElementById('rewards');
+                    const el = document.getElementById('how-it-works');
                     if (el) el.scrollIntoView({ behavior: 'smooth' });
                   }}
                 >
-                  Explore Rewards
+                  View How It Works
                 </button>
               </div>
 
               <div className="mt-4 pt-2 d-flex align-items-center gap-4 text-muted small">
                 <div className="d-flex align-items-center gap-2">
                   <CheckCircle2 size={16} className="text-success" />
-                  <span>Free Registration</span>
+                  <span>Verified Points Ledger</span>
                 </div>
                 <div className="d-flex align-items-center gap-2">
                   <CheckCircle2 size={16} className="text-success" />
                   <span>No Real-Money Gambling</span>
                 </div>
-                <div className="d-flex align-items-center gap-2">
-                  <CheckCircle2 size={16} className="text-success" />
-                  <span>Verified Redemptions</span>
-                </div>
               </div>
             </div>
 
-            {/* Interactive Hero Visual */}
+            {/* Right Hero Visual: Rewards Command Center Card with Subtle Floating Cards */}
             <div className="col-lg-6">
               <div className="position-relative">
-                <div className="card-saas p-4 p-md-5 border-0 shadow-lg position-relative z-1 overflow-hidden" style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)', color: '#ffffff' }}>
-                  {/* Decorative Elements */}
-                  <div className="position-absolute top-0 end-0 p-3 opacity-20">
-                    <Sparkles size={120} />
+                {/* Floating Card 1 */}
+                <div className="position-absolute top-0 start-0 translate-middle-y z-2 d-none d-md-block animate-float-1" style={{ left: '-20px' }}>
+                  <div className="glass-card p-2 px-3 d-flex align-items-center gap-2 shadow-md">
+                    <div className="p-1.5 rounded-circle bg-warning text-dark font-weight-bold">
+                      <Coins size={14} />
+                    </div>
+                    <span className="small font-weight-bold text-dark">+120 VE Points</span>
                   </div>
+                </div>
 
+                {/* Floating Card 2 */}
+                <div className="position-absolute bottom-0 end-0 translate-middle-y z-2 d-none d-md-block animate-float-2" style={{ right: '-20px', bottom: '15%' }}>
+                  <div className="glass-card p-2 px-3 d-flex align-items-center gap-2 shadow-md">
+                    <div className="p-1.5 rounded-circle bg-primary text-white font-weight-bold">
+                      <Award size={14} />
+                    </div>
+                    <span className="small font-weight-bold text-dark">Achievement Unlocked</span>
+                  </div>
+                </div>
+
+                {/* Main Command Center Card */}
+                <div className="card-saas p-4 p-md-5 border-0 shadow-lg position-relative z-1 overflow-hidden" style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)', color: '#ffffff' }}>
                   <div className="d-flex justify-content-between align-items-center mb-4">
                     <div className="d-flex align-items-center gap-2">
                       <div className="p-2 rounded-3 bg-warning text-dark font-weight-bold">
-                        <Coins size={20} />
+                        <Coins size={22} />
                       </div>
                       <div>
                         <span className="d-block small opacity-75 text-uppercase tracking-wider">VE Points Balance</span>
@@ -493,42 +307,35 @@ export const Dashboard = () => {
                       </div>
                     </div>
                     <span className="badge bg-white bg-opacity-20 text-white font-weight-bold px-3 py-2 rounded-pill">
-                      🔥 {user?.streakDays || 7} Day Streak
+                      Lvl {user?.level || 4} Explorer
                     </span>
                   </div>
 
-                  {/* XP Progress Card */}
+                  {/* Level Progress Bar */}
                   <div className="p-3 rounded-3 mb-4" style={{ background: 'rgba(255, 255, 255, 0.08)', backdropFilter: 'blur(10px)' }}>
                     <div className="d-flex justify-content-between small mb-2">
-                      <span className="font-weight-medium">Level {user?.level || 3} Explorer Progress</span>
-                      <span>{user?.xp || 1450} / 2000 XP</span>
+                      <span className="font-weight-medium">Level Progression ({user?.xp || 2450} / 3000 XP)</span>
+                      <span>81%</span>
                     </div>
                     <div className="progress bg-black bg-opacity-30 rounded-pill" style={{ height: '8px' }}>
-                      <div
-                        className="progress-bar rounded-pill"
-                        style={{ width: '72.5%', background: 'linear-gradient(90deg, #818cf8 0%, #a855f7 100%)' }}
-                      />
+                      <div className="progress-bar rounded-pill" style={{ width: '81%', background: 'linear-gradient(90deg, #818cf8 0%, #a855f7 100%)' }} />
                     </div>
                   </div>
 
-                  {/* Mini Preview Cards */}
+                  {/* Next Reward Target & Badge Showcase */}
                   <div className="row g-3">
                     <div className="col-6">
                       <div className="p-3 rounded-3 bg-white bg-opacity-10 border border-white border-opacity-10">
-                        <span className="small opacity-75 d-block mb-1">Active Challenge</span>
-                        <div className="d-flex align-items-center justify-content-between">
-                          <span className="fw-semibold small">Daily Check-in</span>
-                          <span className="badge bg-success font-weight-bold">+50 Pts</span>
-                        </div>
+                        <span className="small opacity-75 d-block mb-1">Target Reward</span>
+                        <div className="fw-semibold small text-truncate">Wireless Earbuds</div>
+                        <span className="badge bg-warning text-dark mt-1">65% Unlocked</span>
                       </div>
                     </div>
                     <div className="col-6">
                       <div className="p-3 rounded-3 bg-white bg-opacity-10 border border-white border-opacity-10">
-                        <span className="small opacity-75 d-block mb-1">Featured Reward</span>
-                        <div className="d-flex align-items-center justify-content-between">
-                          <span className="fw-semibold small line-clamp-1">Wireless Earbuds</span>
-                          <span className="badge bg-warning text-dark font-weight-bold">2,500 Pts</span>
-                        </div>
+                        <span className="small opacity-75 d-block mb-1">Badge Status</span>
+                        <div className="fw-semibold small text-truncate">7 Day Streak</div>
+                        <span className="badge bg-success mt-1">Unlocked</span>
                       </div>
                     </div>
                   </div>
@@ -548,81 +355,69 @@ export const Dashboard = () => {
         </div>
       )}
 
-      {/* 2. TRUST / STATS SECTION */}
-      <section id="trust-stats" className="py-4 bg-white border-y">
+      {/* 5. QUICK STATS STRIP */}
+      <section id="quick-stats" className="py-4 bg-white border-y">
         <div className="container">
-          <div className="text-center mb-3">
-            <span className="badge badge-indigo">Platform Statistics (Demo Data)</span>
-          </div>
-
-          <div className="row g-4 text-center">
+          <div className="row g-3">
             <div className="col-6 col-md-3">
-              <div className="p-3">
-                <h2 className="display-6 font-weight-bold text-indigo mb-1">24+</h2>
-                <p className="text-muted font-weight-medium mb-0">Rewards Available</p>
-                <span className="small text-muted">Electronics & Cards</span>
+              <div className="glass-card p-3 text-center">
+                <span className="small text-muted font-weight-medium d-block mb-1">VE Points Balance</span>
+                <h4 className="mb-0 font-weight-bold text-primary">
+                  <Coins size={18} className="me-1 text-warning" />
+                  {isAuthenticated && user ? user.pointsBalance?.toLocaleString() : '3,450'} VE
+                </h4>
               </div>
             </div>
             <div className="col-6 col-md-3">
-              <div className="p-3">
-                <h2 className="display-6 font-weight-bold text-indigo mb-1">12+</h2>
-                <p className="text-muted font-weight-medium mb-0">Active Challenges</p>
-                <span className="small text-muted">Daily & Weekly Tasks</span>
+              <div className="glass-card p-3 text-center">
+                <span className="small text-muted font-weight-medium d-block mb-1">Current Level</span>
+                <h4 className="mb-0 font-weight-bold text-indigo">
+                  Level {user?.level || 4}
+                </h4>
               </div>
             </div>
             <div className="col-6 col-md-3">
-              <div className="p-3">
-                <h2 className="display-6 font-weight-bold text-indigo mb-1">1.2M+</h2>
-                <p className="text-muted font-weight-medium mb-0">Points Earned</p>
-                <span className="small text-muted">Sample Ecosystem</span>
+              <div className="glass-card p-3 text-center">
+                <span className="small text-muted font-weight-medium d-block mb-1">Active Challenges</span>
+                <h4 className="mb-0 font-weight-bold text-dark">
+                  {challenges.length > 0 ? `${challenges.length} Available` : '12 Missions'}
+                </h4>
               </div>
             </div>
             <div className="col-6 col-md-3">
-              <div className="p-3">
-                <h2 className="display-6 font-weight-bold text-indigo mb-1">15,000+</h2>
-                <p className="text-muted font-weight-medium mb-0">Achievements Unlocked</p>
-                <span className="small text-muted">Member Milestones</span>
+              <div className="glass-card p-3 text-center">
+                <span className="small text-muted font-weight-medium d-block mb-1">Achievements</span>
+                <h4 className="mb-0 font-weight-bold text-success">
+                  {achievements.filter(a => a.unlocked).length > 0 ? `${achievements.filter(a => a.unlocked).length} Unlocked` : '5 Badges'}
+                </h4>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 3. WAYS TO EARN SECTION */}
-      <section id="ways-to-earn" className="py-5">
+      {/* 6. YOUR REWARD JOURNEY SECTION */}
+      <section id="journey" className="py-5">
         <div className="container py-4">
           <div className="text-center mb-5">
-            <span className="badge badge-indigo mb-2">Earning System</span>
-            <h2 className="section-title h1 mb-2">Multiple Ways to Earn VE Points</h2>
+            <span className="badge badge-indigo mb-2">Platform Progression</span>
+            <h2 className="section-title h1 mb-2">Your Reward Journey</h2>
             <p className="section-subtitle">
-              Participate in daily check-ins, complete activity challenges, hit milestone streaks, and invite friends to accumulate points fast.
+              Follow your continuous progress path from registration to redeeming physical tech items and digital cards.
             </p>
           </div>
 
-          <div className="row g-4">
-            {waysToEarn.map(item => {
-              const Icon = item.icon;
+          <div className="row g-4 justify-content-center">
+            {journeySteps.map((step, idx) => {
+              const Icon = step.icon;
               return (
-                <div key={item.id} className="col-md-6 col-lg-4">
-                  <div className="card-saas p-4 h-100 d-flex flex-column justify-content-between">
-                    <div>
-                      <div className="d-flex align-items-center justify-content-between mb-3">
-                        <div className="p-3 rounded-3 bg-primary-light text-primary">
-                          <Icon size={24} />
-                        </div>
-                        <span className="badge badge-gold">{item.points}</span>
-                      </div>
-                      <h5 className="font-weight-bold text-dark mb-2">{item.title}</h5>
-                      <p className="text-muted small mb-4">{item.description}</p>
+                <div key={step.key} className="col-md-4 col-lg-2.4 col-6">
+                  <div className="card-saas p-4 text-center h-100 position-relative">
+                    <div className="p-3 rounded-circle bg-primary-light text-primary d-inline-flex mb-3">
+                      <Icon size={24} />
                     </div>
-
-                    <button
-                      type="button"
-                      className="btn btn-outline-indigo btn-sm w-100 font-weight-semibold"
-                      onClick={() => setActiveEarnModal(item)}
-                    >
-                      Learn More
-                    </button>
+                    <span className="badge badge-gold d-inline-block mb-2 font-weight-bold">{step.title}</span>
+                    <p className="text-muted small mb-0">{step.desc}</p>
                   </div>
                 </div>
               );
@@ -631,187 +426,71 @@ export const Dashboard = () => {
         </div>
       </section>
 
-      {/* 4. REWARDS STORE SECTION */}
-      <section id="rewards" className="py-5 bg-white border-y">
-        <div className="container py-4">
-          <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4 gap-3">
-            <div>
-              <span className="badge badge-gold mb-2">Rewards Store</span>
-              <h2 className="section-title h1 mb-1">Redeem Available Platform Rewards</h2>
-              <p className="text-muted mb-0">Use your accumulated VE Points to claim physical tech items and instant digital cards.</p>
-            </div>
-
-            {/* Category Filter Tabs */}
-            <div className="d-flex flex-wrap gap-1 bg-light p-1.5 rounded-3 border">
-              {['ALL', 'AUDIO', 'WEARABLES', 'GIFT_CARDS', 'ACCESSORIES', 'MERCHANDISE'].map(cat => (
-                <button
-                  key={cat}
-                  type="button"
-                  className={`btn btn-sm rounded-2 font-weight-medium ${selectedRewardCategory === cat ? 'btn-indigo' : 'text-muted bg-transparent border-0'}`}
-                  onClick={() => setSelectedRewardCategory(cat)}
-                >
-                  {cat === 'ALL' ? 'All Items' : cat.replace('_', ' ')}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="row g-4">
-            {displayRewards.map(item => (
-              <div key={item._id} className="col-sm-6 col-lg-4 col-xl-3">
-                <div className="card-saas h-100 overflow-hidden d-flex flex-column">
-                  <div className="position-relative bg-light" style={{ height: '200px' }}>
-                    <img
-                      src={item.imageUrl}
-                      alt={item.title}
-                      className="w-100 h-100 object-fit-cover"
-                    />
-                    <span className="position-absolute top-0 end-0 m-3 badge badge-gold font-weight-bold">
-                      <Coins size={12} className="me-1" />
-                      {item.pointsRequired?.toLocaleString()} Pts
-                    </span>
-                    <span className="position-absolute top-0 start-0 m-3 badge bg-white text-dark border small">
-                      {item.itemType === 'DIGITAL' ? 'Digital Code' : 'Physical Item'}
-                    </span>
-                  </div>
-
-                  <div className="p-4 d-flex flex-column flex-grow-1 justify-content-between">
-                    <div>
-                      <div className="d-flex justify-content-between align-items-center mb-1">
-                        <span className="small text-indigo font-weight-semibold">{item.category?.replace('_', ' ')}</span>
-                        <span className={`small font-weight-bold ${item.stock > 0 ? 'text-success' : 'text-danger'}`}>
-                          {item.stock > 0 ? `${item.stock} Available` : 'Out of Stock'}
-                        </span>
-                      </div>
-                      <h5 className="font-weight-bold text-dark mb-2 h6">{item.title}</h5>
-                      <p className="text-muted small line-clamp-2 mb-3">{item.description}</p>
-                    </div>
-
-                    <button
-                      type="button"
-                      className="btn btn-gold w-100 font-weight-bold rounded-3"
-                      disabled={item.stock === 0}
-                      onClick={() => {
-                        setRedeemingReward(item);
-                        setRedeemError('');
-                        setRedeemSuccess(null);
-                      }}
-                    >
-                      Redeem Reward
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 5. HOW IT WORKS SECTION */}
-      <section id="how-it-works" className="py-5">
-        <div className="container py-4">
-          <div className="text-center mb-5">
-            <span className="badge badge-indigo mb-2">Simple Process</span>
-            <h2 className="section-title h1 mb-2">How VELOOP Rewards Works</h2>
-            <p className="section-subtitle">
-              Follow our simple 4-step process to create your account, complete activities, accumulate VE Points, and redeem your rewards.
-            </p>
-          </div>
-
-          <div className="row g-4">
-            {howItWorksSteps.map((step, idx) => (
-              <div key={step.number} className="col-md-6 col-lg-3">
-                <div className="card-saas p-4 h-100 position-relative">
-                  <div className="d-flex align-items-center justify-content-between mb-3">
-                    <span className="display-5 font-weight-bold text-indigo opacity-40">{step.number}</span>
-                    {idx < 3 && <ArrowRight size={20} className="text-muted d-none d-lg-block" />}
-                  </div>
-                  <h5 className="font-weight-bold text-dark mb-2">{step.title}</h5>
-                  <p className="text-muted small mb-0">{step.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 6. CHALLENGES SECTION */}
-      <section id="challenges" className="py-5 bg-white border-y">
+      {/* 7. TODAY'S MISSIONS SECTION */}
+      <section id="missions" className="py-5 bg-white border-y">
         <div className="container py-4">
           <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
             <div>
-              <span className="badge badge-indigo mb-2">Interactive Challenges</span>
-              <h2 className="section-title h1 mb-1">Daily & Weekly Challenges</h2>
-              <p className="text-muted mb-0">Complete tasks to earn points and XP instantly on your account.</p>
+              <span className="badge badge-indigo mb-2">Daily Activity Tasks</span>
+              <h2 className="section-title h1 mb-1">Today's Missions</h2>
+              <p className="text-muted mb-0">Complete objectives to earn instant VE Points and level XP.</p>
             </div>
 
-            <div className="d-flex gap-2 bg-light p-1 rounded-3 border">
-              <button
-                type="button"
-                className={`btn btn-sm px-4 rounded-2 font-weight-bold ${challengeTab === 'DAILY' ? 'btn-indigo' : 'text-muted border-0 bg-transparent'}`}
-                onClick={() => setChallengeTab('DAILY')}
-              >
-                Daily Challenges
-              </button>
-              <button
-                type="button"
-                className={`btn btn-sm px-4 rounded-2 font-weight-bold ${challengeTab === 'WEEKLY' ? 'btn-indigo' : 'text-muted border-0 bg-transparent'}`}
-                onClick={() => setChallengeTab('WEEKLY')}
-              >
-                Weekly Challenges
-              </button>
-            </div>
+            <button
+              type="button"
+              className="btn btn-outline-indigo btn-sm font-weight-semibold"
+              onClick={() => navigate('/challenges')}
+            >
+              View All Challenges
+            </button>
           </div>
 
           <div className="row g-4">
-            {filteredChallenges.length === 0 ? (
-              <div className="col-12 text-center py-5">
-                <p className="text-muted">Loading challenges for {challengeTab.toLowerCase()} mode...</p>
-              </div>
+            {challenges.length === 0 ? (
+              <div className="col-12 text-center py-4 text-muted">Loading today's missions...</div>
             ) : (
-              filteredChallenges.map(challenge => (
-                <div key={challenge.id || challenge._id} className="col-md-6 col-lg-4">
+              challenges.slice(0, 4).map(c => (
+                <div key={c.id || c._id} className="col-md-6 col-lg-3">
                   <div className="card-saas p-4 h-100 d-flex flex-column justify-content-between">
                     <div>
                       <div className="d-flex align-items-center justify-content-between mb-3">
                         <span className="badge badge-gold font-weight-bold">
-                          +{challenge.pointsReward} VE Pts
+                          +{c.pointsReward} VE
                         </span>
-                        <span className="badge bg-light text-muted border">
-                          {challenge.category}
+                        <span className="badge bg-light text-muted border small">
+                          {c.category}
                         </span>
                       </div>
-                      <h5 className="font-weight-bold text-dark mb-2">{challenge.title}</h5>
-                      <p className="text-muted small mb-3">{challenge.description}</p>
+                      <h5 className="font-weight-bold text-dark mb-2 h6">{c.title}</h5>
+                      <p className="text-muted small line-clamp-2 mb-3">{c.description}</p>
 
-                      {/* Progress Bar */}
-                      <div className="mb-4">
+                      <div className="mb-3">
                         <div className="d-flex justify-content-between small text-muted mb-1">
                           <span>Progress</span>
-                          <span>{challenge.completed || challenge.claimed ? '1 / 1' : '0 / 1'}</span>
+                          <span>{c.claimed || c.completed ? '1/1' : '0/1'}</span>
                         </div>
-                        <div className="progress rounded-pill bg-light border" style={{ height: '8px' }}>
+                        <div className="progress rounded-pill bg-light border" style={{ height: '6px' }}>
                           <div
                             className="progress-bar bg-primary rounded-pill"
-                            style={{ width: challenge.completed || challenge.claimed ? '100%' : '0%' }}
+                            style={{ width: c.claimed || c.completed ? '100%' : '0%' }}
                           />
                         </div>
                       </div>
                     </div>
 
                     <div>
-                      {challenge.claimed ? (
-                        <div className="alert alert-success py-2 px-3 mb-0 text-center small font-weight-bold rounded-3">
-                          <CheckCircle2 size={16} className="me-1" /> Claimed & Credited
+                      {c.claimed ? (
+                        <div className="alert alert-success py-1.5 px-2 mb-0 text-center small font-weight-bold rounded-3">
+                          <CheckCircle2 size={14} className="me-1" /> Claimed
                         </div>
                       ) : (
                         <button
                           type="button"
-                          className="btn btn-indigo w-100 font-weight-bold"
-                          disabled={claimingId === (challenge.id || challenge._id)}
-                          onClick={() => handleClaimChallenge(challenge.id || challenge._id)}
+                          className="btn btn-indigo w-100 btn-sm font-weight-bold"
+                          disabled={claimingId === (c.id || c._id)}
+                          onClick={() => handleClaimChallenge(c.id || c._id)}
                         >
-                          {claimingId === (challenge.id || challenge._id) ? 'Claiming...' : 'Claim Points'}
+                          {claimingId === (c.id || c._id) ? 'Claiming...' : 'Claim Points'}
                         </button>
                       )}
                     </div>
@@ -823,14 +502,141 @@ export const Dashboard = () => {
         </div>
       </section>
 
-      {/* 7. ACHIEVEMENTS SECTION */}
-      <section id="achievements" className="py-5">
+      {/* 8. REWARD DISCOVERY SECTION */}
+      <section id="reward-discovery" className="py-5">
+        <div className="container py-4">
+          <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4 gap-3">
+            <div>
+              <span className="badge badge-gold mb-2">Curated Store Catalog</span>
+              <h2 className="section-title h1 mb-1">Find Your Next Reward</h2>
+              <p className="text-muted mb-0">Browse available physical merchandise and digital gift cards.</p>
+            </div>
+
+            {/* Category Filter Tabs & Search */}
+            <div className="d-flex flex-column flex-sm-row gap-2">
+              <div className="input-group input-group-sm" style={{ width: '220px' }}>
+                <span className="input-group-text bg-white border-end-0 text-muted">
+                  <Search size={14} />
+                </span>
+                <input
+                  type="text"
+                  className="form-control bg-white border-start-0 text-dark small"
+                  placeholder="Search rewards..."
+                  value={rewardSearchQuery}
+                  onChange={(e) => setRewardSearchQuery(e.target.value)}
+                />
+              </div>
+
+              <div className="d-flex flex-wrap gap-1 bg-white p-1 rounded-3 border">
+                {['ALL', 'ELECTRONICS', 'ACCESSORIES', 'GIFT_CARDS', 'MERCHANDISE'].map(cat => (
+                  <button
+                    key={cat}
+                    type="button"
+                    className={`btn btn-sm rounded-2 font-weight-medium ${selectedRewardCategory === cat ? 'btn-indigo' : 'text-muted bg-transparent border-0'}`}
+                    onClick={() => setSelectedRewardCategory(cat)}
+                  >
+                    {cat === 'ALL' ? 'All' : cat.replace('_', ' ')}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Reward Cards Grid */}
+          <div className="row g-4">
+            {filteredRewards.slice(0, 8).map(item => {
+              const isOutOfStock = item.status === 'OUT_OF_STOCK' || item.stock <= 0;
+              const canAfford = user ? user.pointsBalance >= item.pointsRequired : false;
+
+              return (
+                <div key={item._id} className="col-sm-6 col-lg-4 col-xl-3">
+                  <div className="card-saas h-100 overflow-hidden d-flex flex-column">
+                    <div className="position-relative bg-light" style={{ height: '180px' }}>
+                      <img src={item.imageUrl} alt={item.title} className="w-100 h-100 object-fit-cover" />
+                      <span className="position-absolute top-0 end-0 m-2 badge badge-gold font-weight-bold">
+                        <Coins size={12} className="me-1" />
+                        {item.pointsRequired?.toLocaleString()} Pts
+                      </span>
+                    </div>
+
+                    <div className="p-4 d-flex flex-column flex-grow-1 justify-content-between">
+                      <div>
+                        <span className="badge badge-indigo small mb-2">{item.category?.replace('_', ' ')}</span>
+                        <h6 className="font-weight-bold text-dark mb-2">{item.title}</h6>
+                        <p className="small text-muted line-clamp-2 mb-3">{item.description}</p>
+                      </div>
+
+                      <button
+                        type="button"
+                        className={`btn w-100 rounded-3 font-weight-bold ${isOutOfStock ? 'btn-secondary disabled' : canAfford ? 'btn-gold' : 'btn-outline-indigo'}`}
+                        disabled={isOutOfStock}
+                        onClick={() => {
+                          setRedeemingReward(item);
+                          setRedeemError('');
+                          setRedeemSuccess(null);
+                        }}
+                      >
+                        {isOutOfStock ? 'Out of Stock' : canAfford ? 'Redeem Item' : 'Explore Details'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* 9. REWARD PROGRESS CARD SECTION */}
+      <section id="reward-progress" className="py-5 bg-white border-y">
+        <div className="container py-4">
+          <div className="mw-100 mx-auto" style={{ maxWidth: '850px' }}>
+            <div className="card-saas p-4 p-md-5 border-primary shadow-lg" style={{ background: 'linear-gradient(135deg, #ffffff 0%, #eef2ff 100%)' }}>
+              <div className="d-flex align-items-center justify-content-between mb-3">
+                <span className="badge badge-gold px-3 py-1.5 font-weight-bold">
+                  🎯 NEXT REWARD TARGET
+                </span>
+                <span className="small text-primary font-weight-bold">
+                  {progressPercent}% Unlocked
+                </span>
+              </div>
+
+              <div className="row align-items-center g-4">
+                <div className="col-md-3 text-center text-md-start">
+                  <img src={targetReward?.imageUrl} alt={targetReward?.title} className="rounded-3 shadow-sm object-fit-cover" style={{ width: '110px', height: '110px' }} />
+                </div>
+
+                <div className="col-md-9">
+                  <h4 className="font-weight-bold text-dark mb-1">{targetReward?.title}</h4>
+                  <p className="text-muted small mb-3">
+                    Current Balance: <strong>{currentPoints?.toLocaleString()} VE Pts</strong> &bull; Target: <strong>{targetCost?.toLocaleString()} VE Pts</strong>
+                  </p>
+
+                  <div className="progress rounded-pill bg-white border mb-2" style={{ height: '12px' }}>
+                    <div
+                      className="progress-bar rounded-pill"
+                      style={{ width: `${progressPercent}%`, background: 'linear-gradient(90deg, #4f46e5 0%, #f59e0b 100%)' }}
+                    />
+                  </div>
+
+                  <span className="small font-weight-bold text-indigo">
+                    {pointsRemaining > 0 ? `${pointsRemaining.toLocaleString()} points to go` : 'Goal Reached! Ready to redeem.'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 10. ACHIEVEMENT SHOWCASE SECTION */}
+      <section id="achievements-showcase" className="py-5">
         <div className="container py-4">
           <div className="text-center mb-5">
-            <span className="badge badge-gold mb-2">Achievement Badges</span>
-            <h2 className="section-title h1 mb-2">Unlock Milestone Achievements</h2>
+            <span className="badge badge-gold mb-2">Built Your Progress?</span>
+            <h2 className="section-title h1 mb-2">Achievement Milestone Showcase</h2>
             <p className="section-subtitle">
-              Collect badges as you level up, complete challenges, build streak records, and redeem store rewards.
+              Collect badges across platform activities, login streaks, challenges, and store redemptions.
             </p>
           </div>
 
@@ -845,15 +651,13 @@ export const Dashboard = () => {
                     <div>
                       <h5 className="font-weight-bold text-dark mb-1">{ach.title}</h5>
                       <span className={`badge ${ach.unlocked ? 'badge-gold' : 'bg-light text-muted border'}`}>
-                        {ach.unlocked ? 'Unlocked Badges' : 'Locked'}
+                        {ach.unlocked ? 'Unlocked' : 'Locked Milestone'}
                       </span>
                     </div>
                   </div>
-
                   <p className="text-muted small mb-3">{ach.description}</p>
-
                   <div className="d-flex justify-content-between align-items-center pt-2 border-top">
-                    <span className="small text-muted font-weight-medium">Bonus Reward:</span>
+                    <span className="small text-muted">Reward:</span>
                     <span className="font-weight-bold text-indigo">+{ach.pointsReward} VE Pts</span>
                   </div>
                 </div>
@@ -863,123 +667,112 @@ export const Dashboard = () => {
         </div>
       </section>
 
-      {/* 8. LEADERBOARD SECTION */}
-      <section id="leaderboard" className="py-5 bg-white border-y">
+      {/* 11. LEVEL SYSTEM SECTION */}
+      <section id="level-system" className="py-5 bg-white border-y">
+        <div className="container py-4">
+          <div className="mw-100 mx-auto text-center" style={{ maxWidth: '800px' }}>
+            <span className="badge badge-indigo mb-2">Progression Framework</span>
+            <h2 className="section-title h1 mb-3">Level & XP Progression</h2>
+            
+            <div className="card-saas p-4 p-md-5 text-start">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <span className="text-muted small d-block font-weight-medium">CURRENT STATUS</span>
+                  <h4 className="font-weight-bold text-dark mb-0">LEVEL 04 — REWARD EXPLORER</h4>
+                </div>
+                <span className="badge badge-gold fs-6 px-3 py-2">550 XP to Level 5</span>
+              </div>
+
+              <div className="progress rounded-pill bg-light border mb-3" style={{ height: '14px' }}>
+                <div className="progress-bar rounded-pill bg-primary" style={{ width: '81.6%' }} />
+              </div>
+
+              <div className="d-flex justify-content-between small text-muted font-weight-medium">
+                <span>Lvl 1 Explorer</span>
+                <span>Lvl 2 Adventurer</span>
+                <span>Lvl 3 Veteran</span>
+                <span className="text-primary font-weight-bold">Lvl 4 Master</span>
+                <span>Lvl 5 Champion</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 12. LEADERBOARD PREVIEW SECTION */}
+      <section id="leaderboard-preview" className="py-5">
         <div className="container py-4">
           <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
             <div>
               <span className="badge badge-indigo mb-2">Community Ranks</span>
-              <h2 className="section-title h1 mb-1">Global Points Leaderboard</h2>
-              <p className="text-muted mb-0">Track top members competing across weekly and monthly cycles.</p>
+              <h2 className="section-title h1 mb-1">Top Member Rankings</h2>
+              <p className="text-muted mb-0">Weekly VE Points leaderboards with masked identity privacy protection.</p>
             </div>
 
-            <div className="d-flex gap-2 bg-light p-1 rounded-3 border">
-              <button
-                type="button"
-                className={`btn btn-sm px-4 rounded-2 font-weight-bold ${leaderboardTab === 'WEEKLY' ? 'btn-indigo' : 'text-muted border-0 bg-transparent'}`}
-                onClick={() => setLeaderboardTab('WEEKLY')}
-              >
-                Weekly Rank
-              </button>
-              <button
-                type="button"
-                className={`btn btn-sm px-4 rounded-2 font-weight-bold ${leaderboardTab === 'MONTHLY' ? 'btn-indigo' : 'text-muted border-0 bg-transparent'}`}
-                onClick={() => setLeaderboardTab('MONTHLY')}
-              >
-                Monthly Rank
-              </button>
-            </div>
+            <button
+              type="button"
+              className="btn btn-outline-indigo font-weight-semibold"
+              onClick={() => navigate('/leaderboard')}
+            >
+              View Full Leaderboard
+            </button>
           </div>
 
-          {/* Leaderboard Table */}
           <div className="card-saas overflow-hidden border">
             <div className="table-responsive">
               <table className="table table-hover align-middle mb-0">
                 <thead className="bg-light">
-                  <tr>
-                    <th className="py-3 px-4 text-muted small text-uppercase font-weight-bold" style={{ width: '80px' }}>Rank</th>
-                    <th className="py-3 px-4 text-muted small text-uppercase font-weight-bold">Member (Masked)</th>
-                    <th className="py-3 px-4 text-muted small text-uppercase font-weight-bold text-end">Level</th>
-                    <th className="py-3 px-4 text-muted small text-uppercase font-weight-bold text-end">VE Points</th>
+                  <tr className="text-muted small">
+                    <th className="py-3 px-4">Rank</th>
+                    <th className="py-3 px-4">Masked Username</th>
+                    <th className="py-3 px-4 text-end">Level</th>
+                    <th className="py-3 px-4 text-end">VE Points</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {leaderboard.slice(0, 10).map((entry, idx) => {
-                    const isTop3 = idx < 3;
-                    return (
-                      <tr key={entry.userId || idx} className={entry.isCurrentUser ? 'bg-primary-light' : ''}>
-                        <td className="py-3 px-4 font-weight-bold">
-                          {idx === 0 && <span className="badge bg-warning text-dark px-2 py-1">🥇 #1</span>}
-                          {idx === 1 && <span className="badge bg-secondary text-white px-2 py-1">🥈 #2</span>}
-                          {idx === 2 && <span className="badge bg-danger text-white px-2 py-1">🥉 #3</span>}
-                          {!isTop3 && <span className="text-muted">#{entry.rank || idx + 1}</span>}
-                        </td>
-                        <td className="py-3 px-4">
-                          <div className="d-flex align-items-center gap-2">
-                            <div className="p-2 rounded-circle bg-light border text-primary font-weight-bold small">
-                              {entry.maskedName?.substring(0, 2) || 'US'}
-                            </div>
-                            <span className="font-weight-bold text-dark">
-                              {entry.maskedName}
-                              {entry.isCurrentUser && <span className="badge bg-primary ms-2">You</span>}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="py-3 px-4 text-end">
-                          <span className="badge badge-indigo">Lvl {entry.level || 1}</span>
-                        </td>
-                        <td className="py-3 px-4 text-end font-weight-bold text-indigo fs-6">
-                          {entry.points?.toLocaleString()} VE
-                        </td>
-                      </tr>
-                    );
-                  })}
+                  {(leaderboard.length > 0 ? leaderboard.slice(0, 5) : [
+                    { rank: 1, maskedName: 'AYU****92', level: 6, points: 14500 },
+                    { rank: 2, maskedName: 'SAR****14', level: 5, points: 12200 },
+                    { rank: 3, maskedName: 'MAR****88', level: 4, points: 9800 }
+                  ]).map((entry, idx) => (
+                    <tr key={idx}>
+                      <td className="py-3 px-4 font-weight-bold">
+                        {idx === 0 ? '🥇 #1' : idx === 1 ? '🥈 #2' : idx === 2 ? '🥉 #3' : `#${idx + 1}`}
+                      </td>
+                      <td className="py-3 px-4 font-weight-bold text-dark">{entry.maskedName}</td>
+                      <td className="py-3 px-4 text-end"><span className="badge badge-indigo">Lvl {entry.level}</span></td>
+                      <td className="py-3 px-4 text-end font-weight-bold text-primary">{entry.points?.toLocaleString()} VE</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
           </div>
-
-          {/* User's Position Banner */}
-          {isAuthenticated && user && (
-            <div className="mt-4 p-3 bg-primary-light border border-primary rounded-3 d-flex justify-content-between align-items-center">
-              <div className="d-flex align-items-center gap-3">
-                <Trophy className="text-primary" size={24} />
-                <div>
-                  <span className="small text-muted d-block font-weight-medium">Your Current Position</span>
-                  <h6 className="mb-0 font-weight-bold text-dark">{user.name}</h6>
-                </div>
-              </div>
-              <div className="text-end">
-                <span className="badge badge-gold me-2">{user.pointsBalance?.toLocaleString()} VE Pts</span>
-                <span className="badge badge-indigo">Level {user.level}</span>
-              </div>
-            </div>
-          )}
         </div>
       </section>
 
-      {/* 9. PLATFORM BENEFITS SECTION */}
-      <section id="benefits" className="py-5">
+      {/* 13. PLATFORM BENEFITS SECTION */}
+      <section id="benefits" className="py-5 bg-white border-y">
         <div className="container py-4">
           <div className="text-center mb-5">
-            <span className="badge badge-indigo mb-2">Platform Features</span>
-            <h2 className="section-title h1 mb-2">Built for Performance & Security</h2>
+            <span className="badge badge-gold mb-2">Core Advantages</span>
+            <h2 className="section-title h1 mb-2">Why Choose VELOOP Rewards Hub</h2>
             <p className="section-subtitle">
-              VELOOP Rewards Hub delivers a high-grade rewards experience with server-side validation and continuous tracking.
+              Designed with server-side point validation, instant fulfillment, and transparent progression.
             </p>
           </div>
 
           <div className="row g-4">
-            {platformBenefits.map((b, idx) => {
+            {asymmetricBenefits.map((b, idx) => {
               const Icon = b.icon;
               return (
-                <div key={idx} className="col-md-6 col-lg-4">
-                  <div className="card-saas p-4 h-100">
+                <div key={idx} className={b.size}>
+                  <div className="card-saas p-4 p-md-5 h-100">
                     <div className="p-3 rounded-3 bg-primary-light text-primary d-inline-block mb-3">
-                      <Icon size={24} />
+                      <Icon size={28} />
                     </div>
-                    <h5 className="font-weight-bold text-dark mb-2">{b.title}</h5>
-                    <p className="text-muted small mb-0">{b.description}</p>
+                    <h4 className="font-weight-bold text-dark mb-2">{b.title}</h4>
+                    <p className="text-muted mb-0">{b.desc}</p>
                   </div>
                 </div>
               );
@@ -988,36 +781,79 @@ export const Dashboard = () => {
         </div>
       </section>
 
-      {/* 10. DEMO USER STORIES (TESTIMONIALS) */}
-      <section id="testimonials" className="py-5 bg-white border-y">
+      {/* 14. INTERACTIVE HOW IT WORKS SECTION */}
+      <section id="how-it-works" className="py-5">
         <div className="container py-4">
           <div className="text-center mb-5">
-            <span className="badge badge-gold mb-2">Member Feedback</span>
-            <h2 className="section-title h1 mb-2">Demo Member Stories</h2>
+            <span className="badge badge-indigo mb-2">Interactive Guide</span>
+            <h2 className="section-title h1 mb-2">From Activity to Reward</h2>
             <p className="section-subtitle">
-              Sample experiences from members exploring VELOOP Rewards Hub (Clearly Labelled Sample Data).
+              Click or hover over any step to explore how your activities transform into tangible platform rewards.
+            </p>
+          </div>
+
+          <div className="row g-4 align-items-center">
+            <div className="col-lg-5">
+              <div className="d-flex flex-column gap-3">
+                {interactiveWorkSteps.map((step, idx) => (
+                  <div
+                    key={step.step}
+                    className={`card-saas p-4 cursor-pointer transition-all ${activeWorkStep === idx ? 'border-primary bg-primary-light' : ''}`}
+                    onClick={() => setActiveWorkStep(idx)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <div className="d-flex align-items-center justify-content-between mb-1">
+                      <span className="font-weight-bold text-indigo">{step.step} &bull; {step.title}</span>
+                      <span className="badge badge-gold">{step.badge}</span>
+                    </div>
+                    <p className="text-muted small mb-0">{step.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="col-lg-7">
+              <div className="card-saas p-5 text-center shadow-lg bg-white position-relative">
+                <div className="p-4 rounded-circle bg-primary-light text-primary d-inline-flex mb-3">
+                  <Sparkles size={48} />
+                </div>
+                <h3 className="font-weight-bold text-dark mb-2">
+                  Step {interactiveWorkSteps[activeWorkStep].step}: {interactiveWorkSteps[activeWorkStep].title}
+                </h3>
+                <p className="text-muted lead fs-6 mb-4 max-w-md mx-auto">
+                  {interactiveWorkSteps[activeWorkStep].desc}
+                </p>
+                <div className="p-3 bg-light rounded-3 border d-inline-block text-muted small">
+                  🔒 Server-Side Validated &bull; Real-Time Points Balance Credit
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 15. EXAMPLE REWARD JOURNEYS SECTION */}
+      <section id="example-journeys" className="py-5 bg-white border-y">
+        <div className="container py-4">
+          <div className="text-center mb-5">
+            <span className="badge badge-gold mb-2">Sample Member Paths</span>
+            <h2 className="section-title h1 mb-2">Example Reward Journeys</h2>
+            <p className="section-subtitle">
+              Clearly labelled demo scenarios showing how members build their progress path.
             </p>
           </div>
 
           <div className="row g-4">
-            {demoTestimonials.map((t, idx) => (
+            {exampleJourneys.map((j, idx) => (
               <div key={idx} className="col-md-4">
                 <div className="card-saas p-4 h-100 d-flex flex-column justify-content-between">
                   <div>
-                    <div className="d-flex align-items-center gap-1 text-warning mb-3">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} size={16} fill="#f59e0b" color="#f59e0b" />
-                      ))}
-                    </div>
-                    <p className="text-muted small italic mb-4">"{t.text}"</p>
-                  </div>
-
-                  <div className="d-flex align-items-center gap-3 pt-3 border-top">
-                    <img src={t.avatar} alt={t.name} className="rounded-circle object-fit-cover" style={{ width: '44px', height: '44px' }} />
-                    <div>
-                      <h6 className="mb-0 font-weight-bold text-dark">{t.name}</h6>
-                      <span className="small text-muted">{t.role} &bull; <strong className="text-indigo">{t.points}</strong></span>
-                    </div>
+                    <span className="badge badge-indigo small mb-3">{j.badge}</span>
+                    <h5 className="font-weight-bold text-dark mb-1">{j.name}</h5>
+                    <span className="small text-muted d-block mb-3">{j.role}</span>
+                    <p className="small text-dark font-weight-medium bg-light p-3 rounded-3 border mb-0">
+                      "{j.path}"
+                    </p>
                   </div>
                 </div>
               </div>
@@ -1026,14 +862,14 @@ export const Dashboard = () => {
         </div>
       </section>
 
-      {/* 11. FAQ SECTION */}
+      {/* 16. FAQ SECTION */}
       <section id="faq" className="py-5">
         <div className="container py-4">
           <div className="text-center mb-5">
             <span className="badge badge-indigo mb-2">Help Center</span>
             <h2 className="section-title h1 mb-2">Frequently Asked Questions</h2>
             <p className="section-subtitle">
-              Everything you need to know about VE Points, challenges, and reward redemptions.
+              Clear answers regarding VE Points, missions, achievements, and rewards.
             </p>
           </div>
 
@@ -1065,13 +901,13 @@ export const Dashboard = () => {
         </div>
       </section>
 
-      {/* 12. FINAL CTA SECTION */}
+      {/* 17. FINAL CTA SECTION */}
       <section id="final-cta" className="py-5 bg-white border-y">
         <div className="container py-5 text-center">
           <div className="p-5 rounded-4 bg-primary text-white shadow-lg" style={{ background: 'linear-gradient(135deg, #4f46e5 0%, #312e81 100%)' }}>
-            <h2 className="display-5 font-weight-bold mb-3 text-white">Ready to start earning VE Points?</h2>
+            <h2 className="display-5 font-weight-bold mb-3 text-white">Your next milestone starts here.</h2>
             <p className="lead mb-4 opacity-90 mx-auto" style={{ maxWidth: '600px' }}>
-              Create your free account now to receive welcome points, start daily challenges, and claim your first reward.
+              Complete activities, build your progress and explore what you can unlock.
             </p>
 
             <div className="d-flex flex-wrap justify-content-center gap-3">
@@ -1079,69 +915,28 @@ export const Dashboard = () => {
                 type="button"
                 className="btn btn-gold btn-lg px-4 font-weight-bold"
                 onClick={() => {
-                  if (isAuthenticated) {
-                    const el = document.getElementById('challenges');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  } else {
-                    navigate('/register');
-                  }
+                  const el = document.getElementById('reward-discovery');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
                 }}
               >
-                Get Started
+                Explore Rewards
               </button>
               <button
                 type="button"
                 className="btn btn-outline-light btn-lg px-4 font-weight-bold"
                 onClick={() => {
-                  const el = document.getElementById('rewards');
+                  const el = document.getElementById('missions');
                   if (el) el.scrollIntoView({ behavior: 'smooth' });
                 }}
               >
-                Explore Rewards
+                View Challenges
               </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* MODAL 1: Ways to Earn Details */}
-      {activeEarnModal && (
-        <div className="modal show d-block" style={{ backgroundColor: 'rgba(15,23,42,0.6)' }} tabIndex="-1">
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content border-0 rounded-4 shadow-lg">
-              <div className="modal-header border-bottom">
-                <div className="d-flex align-items-center gap-2">
-                  <span className="badge badge-gold">{activeEarnModal.points}</span>
-                  <h5 className="modal-title font-weight-bold text-dark">{activeEarnModal.title}</h5>
-                </div>
-                <button type="button" className="btn-close" onClick={() => setActiveEarnModal(null)} />
-              </div>
-              <div className="modal-body p-4">
-                <p className="text-muted mb-4">{activeEarnModal.description}</p>
-                <h6 className="font-weight-bold text-dark mb-3">How to Complete:</h6>
-                <ol className="ps-3 mb-4 d-flex flex-column gap-2 text-muted small">
-                  {activeEarnModal.steps.map((step, sIdx) => (
-                    <li key={sIdx}>{step}</li>
-                  ))}
-                </ol>
-                <button
-                  type="button"
-                  className="btn btn-indigo w-100 font-weight-bold"
-                  onClick={() => {
-                    setActiveEarnModal(null);
-                    const el = document.getElementById('challenges');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                >
-                  Start Earning Points
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL 2: Reward Details & Redemption */}
+      {/* MODAL: Reward Redemption Modal */}
       {redeemingReward && (
         <div className="modal show d-block" style={{ backgroundColor: 'rgba(15,23,42,0.6)' }} tabIndex="-1">
           <div className="modal-dialog modal-dialog-centered">
@@ -1159,13 +954,13 @@ export const Dashboard = () => {
                     </div>
                     <h4 className="font-weight-bold text-dark mb-2">Redemption Successful!</h4>
                     <p className="text-muted small mb-3">
-                      You spent <strong>{redeemingReward.pointsRequired} VE Points</strong>. Your updated balance is{' '}
+                      You spent <strong>{redeemingReward.pointsRequired} VE Points</strong>. Remaining balance:{' '}
                       <span className="text-primary font-weight-bold">{redeemSuccess.newBalance} VE Points</span>.
                     </p>
 
                     {redeemingReward.itemType === 'DIGITAL' && redeemSuccess.redemption?.digitalCode && (
                       <div className="p-3 bg-light border rounded-3 mb-3">
-                        <span className="small text-muted d-block">Digital Code:</span>
+                        <span className="small text-muted d-block">Your Digital Code:</span>
                         <code className="h5 text-primary font-weight-bold">{redeemSuccess.redemption.digitalCode}</code>
                       </div>
                     )}
@@ -1193,7 +988,7 @@ export const Dashboard = () => {
 
                     {!isAuthenticated ? (
                       <div className="text-center py-3">
-                        <p className="text-muted small mb-3">Please sign in to your VELOOP account to process reward redemptions.</p>
+                        <p className="text-muted small mb-3">Please sign in to process reward redemptions.</p>
                         <div className="d-flex justify-content-center gap-2">
                           <button
                             type="button"
@@ -1220,12 +1015,12 @@ export const Dashboard = () => {
                     ) : (
                       <>
                         <div className="mb-3">
-                          <span className="small text-muted d-block">Your Points Balance:</span>
+                          <span className="small text-muted d-block">Your Current Balance:</span>
                           <span className="h6 text-dark font-weight-bold">{user?.pointsBalance?.toLocaleString()} VE Points</span>
-                          {user?.pointsBalance < redeemingReward.pointsRequired && (
+                          {user && user.pointsBalance < redeemingReward.pointsRequired && (
                             <div className="text-danger small mt-1">
                               <AlertCircle size={14} className="me-1" />
-                              Insufficient points. You need {redeemingReward.pointsRequired - (user?.pointsBalance || 0)} more points.
+                              Insufficient points balance for this redemption.
                             </div>
                           )}
                         </div>
@@ -1259,9 +1054,9 @@ export const Dashboard = () => {
                           <button
                             type="submit"
                             className="btn btn-gold font-weight-bold rounded-3 px-4"
-                            disabled={user?.pointsBalance < redeemingReward.pointsRequired}
+                            disabled={!user || user.pointsBalance < redeemingReward.pointsRequired}
                           >
-                            Confirm Redemption
+                            Confirm Order
                           </button>
                         </div>
                       </>

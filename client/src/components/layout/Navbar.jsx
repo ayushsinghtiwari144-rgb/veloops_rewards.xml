@@ -76,10 +76,10 @@ export const Navbar = () => {
 
   const navItems = [
     { label: 'Home', sectionId: 'hero' },
-    { label: 'Ways to Earn', sectionId: 'ways-to-earn' },
-    { label: 'Rewards', sectionId: 'rewards' },
-    { label: 'Challenges', sectionId: 'challenges' },
-    { label: 'Leaderboard', sectionId: 'leaderboard' },
+    { label: 'Journey', sectionId: 'journey' },
+    { label: 'Missions', sectionId: 'missions' },
+    { label: 'Rewards', sectionId: 'reward-discovery' },
+    { label: 'Achievements', sectionId: 'achievements-showcase' },
     { label: 'How It Works', sectionId: 'how-it-works' },
     { label: 'FAQ', sectionId: 'faq' }
   ];
