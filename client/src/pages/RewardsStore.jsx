@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getRewardsApi, redeemRewardApi } from '../services/hubService';
-import { Coins, Search, Filter, ShoppingBag, CheckCircle, AlertCircle } from 'lucide-react';
+import { Coins, Search, ShoppingBag, CheckCircle, AlertCircle } from 'lucide-react';
 
 export const RewardsStore = () => {
   const { user, refreshUser } = useAuth();
@@ -55,23 +55,26 @@ export const RewardsStore = () => {
     { id: 'GIFT_CARDS', label: 'Gift Cards' },
     { id: 'WEARABLES', label: 'Wearables' },
     { id: 'AUDIO', label: 'Audio' },
+    { id: 'ACCESSORIES', label: 'Accessories' },
+    { id: 'MERCHANDISE', label: 'Merchandise' },
     { id: 'GAMING', label: 'Gaming' }
   ];
 
   return (
-    <div className="container py-4">
+    <div className="container py-5">
       {/* Store Header */}
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
         <div>
-          <h2 className="display-6 text-white font-weight-bold mb-1">🎁 Rewards Store</h2>
-          <p className="text-secondary mb-0">Redeem authentic tech products and instant gift cards with your VE Points</p>
+          <span className="badge badge-gold mb-2">Rewards Store</span>
+          <h2 className="section-title h1 mb-1">🎁 Exclusive Platform Rewards</h2>
+          <p className="text-muted mb-0">Redeem authentic tech products and instant gift cards with your VE Points</p>
         </div>
 
         {user && (
-          <div className="p-3 bg-dark border border-warning rounded-3 text-white">
-            <span className="small text-secondary d-block">Your Balance</span>
-            <span className="h5 text-warning font-weight-bold mb-0">
-              <Coins size={18} className="me-1" />
+          <div className="p-3 bg-white border rounded-3 shadow-sm">
+            <span className="small text-muted d-block font-weight-medium">Your VE Balance</span>
+            <span className="h5 text-primary font-weight-bold mb-0">
+              <Coins size={18} className="me-1 text-warning" />
               {user.pointsBalance?.toLocaleString()} VE Points
             </span>
           </div>
@@ -79,13 +82,14 @@ export const RewardsStore = () => {
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="row g-3 mb-4">
+      <div className="row g-3 mb-4 align-items-center">
         <div className="col-md-8">
           <div className="d-flex flex-wrap gap-2">
             {categories.map(c => (
               <button
                 key={c.id}
-                className={`btn btn-sm rounded-pill px-3 font-weight-medium ${selectedCategory === c.id ? 'btn-primary' : 'btn-outline-secondary text-white'}`}
+                type="button"
+                className={`btn btn-sm rounded-pill px-3 font-weight-medium ${selectedCategory === c.id ? 'btn-indigo' : 'btn-outline-secondary'}`}
                 onClick={() => setSelectedCategory(c.id)}
               >
                 {c.label}
@@ -96,12 +100,12 @@ export const RewardsStore = () => {
 
         <div className="col-md-4">
           <div className="input-group">
-            <span className="input-group-text bg-dark border-secondary text-secondary">
+            <span className="input-group-text bg-white border-end-0 text-muted">
               <Search size={16} />
             </span>
             <input
               type="text"
-              className="form-control bg-dark border-secondary text-white"
+              className="form-control bg-white border-start-0 text-dark"
               placeholder="Search rewards..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -112,11 +116,11 @@ export const RewardsStore = () => {
 
       {/* Rewards Grid */}
       {loading ? (
-        <div className="text-center py-5 text-secondary">Loading store items...</div>
+        <div className="text-center py-5 text-muted">Loading store items...</div>
       ) : rewards.length === 0 ? (
-        <div className="text-center py-5 text-secondary border border-secondary rounded-4 bg-dark">
-          <ShoppingBag size={48} className="mb-2 opacity-50" />
-          <h5>No rewards found in this category</h5>
+        <div className="text-center py-5 text-muted card-saas">
+          <ShoppingBag size={48} className="mb-2 opacity-50 text-indigo" />
+          <h5 className="font-weight-bold text-dark">No rewards found in this category</h5>
           <p className="small mb-0">Try clearing your search query or selecting another category.</p>
         </div>
       ) : (
@@ -127,10 +131,10 @@ export const RewardsStore = () => {
 
             return (
               <div key={item._id} className="col-xl-3 col-lg-4 col-md-6">
-                <div className="card h-100 bg-dark border-secondary text-white rounded-4 overflow-hidden shadow-sm d-flex flex-column">
-                  <div className="position-relative" style={{ height: '200px', background: '#1e293b' }}>
+                <div className="card-saas h-100 overflow-hidden d-flex flex-column">
+                  <div className="position-relative bg-light" style={{ height: '200px' }}>
                     <img src={item.imageUrl} alt={item.title} className="w-100 h-100 object-fit-cover" />
-                    <span className="position-absolute top-0 end-0 m-2 badge bg-warning text-dark font-weight-bold px-2 py-1.5 rounded">
+                    <span className="position-absolute top-0 end-0 m-2 badge badge-gold font-weight-bold">
                       <Coins size={12} className="me-1" />
                       {item.pointsRequired?.toLocaleString()} Pts
                     </span>
@@ -141,19 +145,20 @@ export const RewardsStore = () => {
                     )}
                   </div>
 
-                  <div className="card-body d-flex flex-column justify-content-between p-3">
+                  <div className="p-4 d-flex flex-column flex-grow-1 justify-content-between">
                     <div>
                       <div className="d-flex justify-content-between align-items-center mb-1">
-                        <span className="badge bg-secondary text-light small">{item.category}</span>
-                        <span className="small text-secondary">{item.stock} in stock</span>
+                        <span className="badge badge-indigo small">{item.category?.replace('_', ' ')}</span>
+                        <span className="small text-muted">{item.stock} in stock</span>
                       </div>
-                      <h6 className="card-title font-weight-bold text-white mb-2">{item.title}</h6>
-                      <p className="card-text small text-secondary line-clamp-2">{item.description}</p>
+                      <h6 className="font-weight-bold text-dark mb-2">{item.title}</h6>
+                      <p className="small text-muted line-clamp-2 mb-3">{item.description}</p>
                     </div>
 
-                    <div className="mt-3">
+                    <div>
                       <button
-                        className={`btn w-100 rounded-3 font-weight-bold ${isOutOfStock ? 'btn-secondary disabled' : canAfford ? 'btn-primary' : 'btn-outline-warning'}`}
+                        type="button"
+                        className={`btn w-100 rounded-3 font-weight-bold ${isOutOfStock ? 'btn-secondary disabled' : canAfford ? 'btn-gold' : 'btn-outline-indigo'}`}
                         disabled={isOutOfStock}
                         onClick={() => {
                           setRedeemingReward(item);
@@ -174,44 +179,44 @@ export const RewardsStore = () => {
 
       {/* Redeem Modal */}
       {redeemingReward && (
-        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.85)' }} tabIndex="-1">
+        <div className="modal show d-block" style={{ backgroundColor: 'rgba(15,23,42,0.6)' }} tabIndex="-1">
           <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content bg-dark border border-secondary text-white rounded-4">
-              <div className="modal-header border-secondary">
-                <h5 className="modal-title font-weight-bold">Redeem {redeemingReward.title}</h5>
-                <button type="button" className="btn-close btn-close-white" onClick={() => setRedeemingReward(null)} />
+            <div className="modal-content border-0 rounded-4 shadow-lg">
+              <div className="modal-header border-bottom">
+                <h5 className="modal-title font-weight-bold text-dark">Redeem {redeemingReward.title}</h5>
+                <button type="button" className="btn-close" onClick={() => setRedeemingReward(null)} />
               </div>
 
-              <div className="modal-body">
+              <div className="modal-body p-4">
                 {redeemSuccess ? (
                   <div className="text-center py-3">
-                    <div className="p-3 bg-success bg-opacity-20 rounded-circle d-inline-block text-success mb-3">
+                    <div className="p-3 bg-success bg-opacity-10 text-success rounded-circle d-inline-block mb-3">
                       <CheckCircle size={48} />
                     </div>
-                    <h4 className="font-weight-bold text-white mb-2">Redemption Successful!</h4>
-                    <p className="text-secondary small mb-3">
+                    <h4 className="font-weight-bold text-dark mb-2">Redemption Successful!</h4>
+                    <p className="text-muted small mb-3">
                       You spent <strong>{redeemingReward.pointsRequired} VE Points</strong>. Remaining balance:{' '}
-                      <span className="text-warning font-weight-bold">{redeemSuccess.newBalance} VE Points</span>.
+                      <span className="text-primary font-weight-bold">{redeemSuccess.newBalance} VE Points</span>.
                     </p>
 
                     {redeemingReward.itemType === 'DIGITAL' && redeemSuccess.redemption?.digitalCode && (
-                      <div className="p-3 bg-dark-subtle border border-warning rounded-3 mb-3">
-                        <span className="small text-secondary d-block">Your Digital Gift Code:</span>
-                        <code className="h5 text-warning font-weight-bold">{redeemSuccess.redemption.digitalCode}</code>
+                      <div className="p-3 bg-light border rounded-3 mb-3">
+                        <span className="small text-muted d-block">Your Digital Gift Code:</span>
+                        <code className="h5 text-primary font-weight-bold">{redeemSuccess.redemption.digitalCode}</code>
                       </div>
                     )}
 
-                    <button className="btn btn-secondary rounded-3 px-4" onClick={() => setRedeemingReward(null)}>
+                    <button type="button" className="btn btn-secondary rounded-3 px-4" onClick={() => setRedeemingReward(null)}>
                       Close
                     </button>
                   </div>
                 ) : (
                   <form onSubmit={handleExecuteRedeem}>
-                    <div className="d-flex align-items-center gap-3 p-3 bg-dark-subtle rounded-3 mb-3 border border-secondary">
+                    <div className="d-flex align-items-center gap-3 p-3 bg-light rounded-3 mb-3 border">
                       <img src={redeemingReward.imageUrl} alt={redeemingReward.title} style={{ width: '60px', height: '60px', objectFit: 'cover' }} className="rounded" />
                       <div>
-                        <h6 className="mb-1 text-white">{redeemingReward.title}</h6>
-                        <span className="text-warning font-weight-bold small">
+                        <h6 className="mb-1 text-dark font-weight-bold">{redeemingReward.title}</h6>
+                        <span className="badge badge-gold">
                           <Coins size={14} className="me-1" />
                           {redeemingReward.pointsRequired?.toLocaleString()} VE Points
                         </span>
@@ -219,9 +224,9 @@ export const RewardsStore = () => {
                     </div>
 
                     <div className="mb-3">
-                      <span className="small text-secondary d-block">Your Current Balance:</span>
-                      <span className="h6 text-white font-weight-bold">{user?.pointsBalance?.toLocaleString()} VE Points</span>
-                      {user?.pointsBalance < redeemingReward.pointsRequired && (
+                      <span className="small text-muted d-block">Your Current Balance:</span>
+                      <span className="h6 text-dark font-weight-bold">{user?.pointsBalance?.toLocaleString()} VE Points</span>
+                      {user && user.pointsBalance < redeemingReward.pointsRequired && (
                         <div className="text-danger small mt-1">
                           <AlertCircle size={14} className="me-1" />
                           Insufficient points. You need {redeemingReward.pointsRequired - user.pointsBalance} more points.
@@ -231,9 +236,9 @@ export const RewardsStore = () => {
 
                     {redeemingReward.itemType === 'PHYSICAL' && (
                       <div className="mb-3">
-                        <label className="form-label small text-secondary">Shipping Address</label>
+                        <label className="form-label small text-muted font-weight-medium">Shipping Address</label>
                         <textarea
-                          className="form-control bg-dark border-secondary text-white"
+                          className="form-control border text-dark"
                           rows="3"
                           placeholder="Street address, city, postal code, country..."
                           value={shippingAddress}
@@ -253,8 +258,8 @@ export const RewardsStore = () => {
                       </button>
                       <button
                         type="submit"
-                        className="btn btn-warning font-weight-bold rounded-3 px-4"
-                        disabled={user?.pointsBalance < redeemingReward.pointsRequired}
+                        className="btn btn-gold font-weight-bold rounded-3 px-4"
+                        disabled={!user || user.pointsBalance < redeemingReward.pointsRequired}
                       >
                         Confirm Order
                       </button>
@@ -269,3 +274,5 @@ export const RewardsStore = () => {
     </div>
   );
 };
+
+export default RewardsStore;

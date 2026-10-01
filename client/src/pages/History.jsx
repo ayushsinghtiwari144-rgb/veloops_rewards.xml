@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getTransactionsApi, getRedemptionsApi } from '../services/hubService';
-import { History as HistoryIcon, Gift, Coins, Clock, CheckCircle } from 'lucide-react';
+import { Gift, Coins, Clock } from 'lucide-react';
 
 export const History = () => {
   const [activeTab, setActiveTab] = useState('transactions');
@@ -15,8 +15,8 @@ export const History = () => {
         getTransactionsApi(),
         getRedemptionsApi()
       ]);
-      setTransactions(txData);
-      setRedemptions(redData);
+      setTransactions(txData || []);
+      setRedemptions(redData || []);
     } catch (err) {
       console.error('Failed to load history data:', err);
     } finally {
@@ -29,23 +29,26 @@ export const History = () => {
   }, []);
 
   return (
-    <div className="container py-4">
+    <div className="container py-5">
       {/* Header */}
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
         <div>
-          <h2 className="display-6 text-white font-weight-bold mb-1">📜 Points Ledger & History</h2>
-          <p className="text-secondary mb-0">Detailed transaction audit log of all points earned, spent, and reward redemptions</p>
+          <span className="badge badge-gold mb-2">Audit Ledger</span>
+          <h2 className="section-title h1 mb-1">📜 Points Ledger & History</h2>
+          <p className="text-muted mb-0">Detailed transaction audit log of all points earned, spent, and reward redemptions</p>
         </div>
 
         <div className="d-flex gap-2">
           <button
-            className={`btn ${activeTab === 'transactions' ? 'btn-primary' : 'btn-outline-secondary text-white'}`}
+            type="button"
+            className={`btn btn-sm rounded-pill px-3 font-weight-medium ${activeTab === 'transactions' ? 'btn-indigo' : 'btn-outline-secondary'}`}
             onClick={() => setActiveTab('transactions')}
           >
             <Coins size={16} className="me-1" /> Points Ledger
           </button>
           <button
-            className={`btn ${activeTab === 'redemptions' ? 'btn-primary' : 'btn-outline-secondary text-white'}`}
+            type="button"
+            className={`btn btn-sm rounded-pill px-3 font-weight-medium ${activeTab === 'redemptions' ? 'btn-indigo' : 'btn-outline-secondary'}`}
             onClick={() => setActiveTab('redemptions')}
           >
             <Gift size={16} className="me-1" /> Reward Redemptions ({redemptions.length})
@@ -54,45 +57,47 @@ export const History = () => {
       </div>
 
       {loading ? (
-        <div className="text-center py-5 text-secondary">Loading history ledger...</div>
+        <div className="text-center py-5 text-muted">Loading history ledger...</div>
       ) : activeTab === 'transactions' ? (
-        <div className="p-4 bg-dark border border-secondary rounded-4 text-white">
-          <h5 className="font-weight-bold mb-3">VE Points Ledger Transactions</h5>
+        <div className="card-saas overflow-hidden border">
+          <div className="p-4 bg-light border-bottom">
+            <h5 className="font-weight-bold text-dark mb-0">VE Points Ledger Transactions</h5>
+          </div>
           <div className="table-responsive">
-            <table className="table table-dark table-hover align-middle mb-0">
-              <thead>
-                <tr className="text-secondary small border-secondary">
-                  <th>Date & Time</th>
-                  <th>Transaction Type</th>
-                  <th>Description</th>
-                  <th className="text-end">Amount</th>
-                  <th className="text-end">Balance After</th>
+            <table className="table table-hover align-middle mb-0">
+              <thead className="bg-light">
+                <tr className="text-muted small">
+                  <th className="py-3 px-4">Date & Time</th>
+                  <th className="py-3 px-4">Transaction Type</th>
+                  <th className="py-3 px-4">Description</th>
+                  <th className="py-3 px-4 text-end">Amount</th>
+                  <th className="py-3 px-4 text-end">Balance After</th>
                 </tr>
               </thead>
               <tbody>
                 {transactions.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="text-center py-4 text-secondary">
+                    <td colSpan="5" className="text-center py-4 text-muted">
                       No points transactions recorded yet.
                     </td>
                   </tr>
                 ) : (
                   transactions.map(t => (
-                    <tr key={t._id} className="border-secondary">
-                      <td className="small text-secondary">
+                    <tr key={t._id}>
+                      <td className="py-3 px-4 small text-muted">
                         <Clock size={12} className="me-1" />
                         {new Date(t.createdAt).toLocaleString()}
                       </td>
-                      <td>
+                      <td className="py-3 px-4">
                         <span className={`badge ${t.amount > 0 ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'}`}>
                           {t.type}
                         </span>
                       </td>
-                      <td className="font-weight-medium text-white">{t.description}</td>
-                      <td className={`text-end font-weight-bold ${t.amount > 0 ? 'text-success' : 'text-danger'}`}>
+                      <td className="py-3 px-4 font-weight-medium text-dark">{t.description}</td>
+                      <td className={`py-3 px-4 text-end font-weight-bold ${t.amount > 0 ? 'text-success' : 'text-danger'}`}>
                         {t.amount > 0 ? `+${t.amount}` : t.amount} VE
                       </td>
-                      <td className="text-end font-weight-bold text-warning">
+                      <td className="py-3 px-4 text-end font-weight-bold text-primary">
                         {t.balanceAfter?.toLocaleString()} VE
                       </td>
                     </tr>
@@ -103,57 +108,45 @@ export const History = () => {
           </div>
         </div>
       ) : (
-        <div className="p-4 bg-dark border border-secondary rounded-4 text-white">
-          <h5 className="font-weight-bold mb-3">Store Reward Redemptions</h5>
+        <div className="card-saas overflow-hidden border">
+          <div className="p-4 bg-light border-bottom">
+            <h5 className="font-weight-bold text-dark mb-0">Redeemed Store Orders</h5>
+          </div>
           <div className="table-responsive">
-            <table className="table table-dark table-hover align-middle mb-0">
-              <thead>
-                <tr className="text-secondary small border-secondary">
-                  <th>Redemption Date</th>
-                  <th>Reward Item</th>
-                  <th>Points Spent</th>
-                  <th>Status</th>
-                  <th>Digital Code / Shipping</th>
+            <table className="table table-hover align-middle mb-0">
+              <thead className="bg-light">
+                <tr className="text-muted small">
+                  <th className="py-3 px-4">Redemption ID</th>
+                  <th className="py-3 px-4">Reward Item</th>
+                  <th className="py-3 px-4">Points Spent</th>
+                  <th className="py-3 px-4">Fulfillment Details</th>
+                  <th className="py-3 px-4 text-end">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {redemptions.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="text-center py-4 text-secondary">
-                      You haven't redeemed any rewards from the store yet.
+                    <td colSpan="5" className="text-center py-4 text-muted">
+                      No reward redemptions logged yet.
                     </td>
                   </tr>
                 ) : (
                   redemptions.map(r => (
-                    <tr key={r._id} className="border-secondary">
-                      <td className="small text-secondary">
-                        {new Date(r.redeemedAt || r.createdAt).toLocaleDateString()}
-                      </td>
-                      <td>
-                        <div className="d-flex align-items-center gap-2">
-                          {r.rewardId?.imageUrl && (
-                            <img src={r.rewardId.imageUrl} alt="" style={{ width: '40px', height: '40px', objectFit: 'cover' }} className="rounded" />
-                          )}
-                          <div>
-                            <span className="font-weight-bold text-white d-block">{r.rewardId?.title || 'Reward Item'}</span>
-                            <span className="small text-secondary">{r.rewardId?.category}</span>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="font-weight-bold text-warning">
-                        {r.pointsSpent?.toLocaleString()} VE
-                      </td>
-                      <td>
-                        <span className={`badge ${r.status === 'FULFILLED' ? 'bg-success' : r.status === 'PROCESSING' ? 'bg-warning text-dark' : 'bg-secondary'}`}>
-                          {r.status}
-                        </span>
-                      </td>
-                      <td>
-                        {r.digitalCode ? (
-                          <code className="text-warning font-weight-bold">{r.digitalCode}</code>
+                    <tr key={r._id}>
+                      <td className="py-3 px-4 small font-weight-bold text-muted">{r._id?.substring(0, 8)}</td>
+                      <td className="py-3 px-4 font-weight-bold text-dark">{r.rewardTitle || r.rewardId?.title || 'Reward Item'}</td>
+                      <td className="py-3 px-4 font-weight-bold text-primary">{r.pointsSpent?.toLocaleString()} VE Pts</td>
+                      <td className="py-3 px-4 small text-muted">
+                        {r.itemType === 'DIGITAL' ? (
+                          <code className="text-primary font-weight-bold">{r.digitalCode || 'INSTANT_DIGITAL_CODE'}</code>
                         ) : (
-                          <span className="small text-secondary">{r.shippingAddress || 'Standard Shipping'}</span>
+                          <span>Shipping: {r.shippingAddress || 'Address Confirmed'}</span>
                         )}
+                      </td>
+                      <td className="py-3 px-4 text-end">
+                        <span className="badge bg-success-subtle text-success">
+                          {r.status || 'FULFILLED'}
+                        </span>
                       </td>
                     </tr>
                   ))
@@ -166,3 +159,5 @@ export const History = () => {
     </div>
   );
 };
+
+export default History;

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getChallengesApi, claimChallengeApi } from '../services/hubService';
-import { Zap, CheckCircle, Clock, Sparkles, Award, Gift, Sun, Users, UserCheck } from 'lucide-react';
+import { Zap, CheckCircle2, Clock, Gift, Sun, Users, UserCheck } from 'lucide-react';
 
 export const Challenges = () => {
-  const { user, refreshUser } = useAuth();
+  const { refreshUser } = useAuth();
   const [challenges, setChallenges] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('ALL');
@@ -54,26 +54,27 @@ export const Challenges = () => {
       case 'UserCheck': return <UserCheck size={24} className="text-info" />;
       case 'Users': return <Users size={24} className="text-success" />;
       case 'Gift': return <Gift size={24} className="text-danger" />;
-      default: return <Zap size={24} className="text-indigo" />;
+      default: return <Zap size={24} className="text-primary" />;
     }
   };
 
   return (
-    <div className="container py-4">
+    <div className="container py-5">
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
         <div>
-          <h2 className="display-6 text-white font-weight-bold mb-1">⚡ Daily & Weekly Challenges</h2>
-          <p className="text-secondary mb-0">Complete platform activities every 24 hours to earn VE Points and XP bonuses</p>
+          <span className="badge badge-indigo mb-2">Interactive Tasks</span>
+          <h2 className="section-title h1 mb-1">⚡ Daily & Weekly Challenges</h2>
+          <p className="text-muted mb-0">Complete platform activities every 24 hours to earn VE Points and XP bonuses</p>
         </div>
 
-        <div className="d-flex align-items-center gap-2 bg-dark p-2 rounded-3 border border-secondary text-secondary small">
+        <div className="d-flex align-items-center gap-2 bg-white p-2 px-3 rounded-3 border text-muted small">
           <Clock size={16} />
-          <span>Resets every midnight (UTC)</span>
+          <span>Resets daily at 00:00 UTC</span>
         </div>
       </div>
 
       {message && (
-        <div className="alert alert-info alert-dismissible fade show rounded-3 mb-4" role="alert">
+        <div className="alert alert-info alert-dismissible fade show rounded-3 mb-4 shadow-sm" role="alert">
           {message}
           <button type="button" className="btn-close" onClick={() => setMessage('')} />
         </div>
@@ -82,73 +83,70 @@ export const Challenges = () => {
       {/* Tabs */}
       <div className="d-flex gap-2 mb-4">
         <button
-          className={`btn ${activeTab === 'ALL' ? 'btn-indigo' : 'btn-outline-secondary text-white'}`}
+          type="button"
+          className={`btn btn-sm rounded-pill px-4 font-weight-medium ${activeTab === 'ALL' ? 'btn-indigo' : 'btn-outline-secondary'}`}
           onClick={() => setActiveTab('ALL')}
         >
           All Challenges
         </button>
         <button
-          className={`btn ${activeTab === 'DAILY' ? 'btn-indigo' : 'btn-outline-secondary text-white'}`}
+          type="button"
+          className={`btn btn-sm rounded-pill px-4 font-weight-medium ${activeTab === 'DAILY' ? 'btn-indigo' : 'btn-outline-secondary'}`}
           onClick={() => setActiveTab('DAILY')}
         >
           Daily ({challenges.filter(c => c.category === 'DAILY').length})
         </button>
         <button
-          className={`btn ${activeTab === 'WEEKLY' ? 'btn-indigo' : 'btn-outline-secondary text-white'}`}
+          type="button"
+          className={`btn btn-sm rounded-pill px-4 font-weight-medium ${activeTab === 'WEEKLY' ? 'btn-indigo' : 'btn-outline-secondary'}`}
           onClick={() => setActiveTab('WEEKLY')}
         >
           Weekly ({challenges.filter(c => c.category === 'WEEKLY').length})
         </button>
       </div>
 
-      {/* Challenges List */}
+      {/* Challenge Grid */}
       {loading ? (
-        <div className="text-center py-5 text-secondary">Loading challenges...</div>
+        <div className="text-center py-5 text-muted">Loading challenges...</div>
+      ) : filteredChallenges.length === 0 ? (
+        <div className="text-center py-5 text-muted card-saas">
+          <Zap size={48} className="mb-2 opacity-50 text-indigo" />
+          <h5 className="font-weight-bold text-dark">No challenges found in this view</h5>
+          <p className="small mb-0">Check back later for newly published daily tasks.</p>
+        </div>
       ) : (
-        <div className="row g-3">
+        <div className="row g-4">
           {filteredChallenges.map(c => (
-            <div key={c.id} className="col-lg-6">
-              <div className="p-4 bg-dark border border-secondary rounded-4 text-white h-100 d-flex flex-column justify-content-between">
-                <div className="d-flex align-items-start gap-3 mb-3">
-                  <div className="p-3 bg-dark-subtle border border-secondary rounded-3">
-                    {getChallengeIcon(c.icon)}
+            <div key={c.id} className="col-md-6 col-lg-4">
+              <div className="card-saas p-4 h-100 d-flex flex-column justify-content-between">
+                <div>
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <div className="p-2 rounded-3 bg-primary-light">
+                      {getChallengeIcon(c.icon)}
+                    </div>
+                    <span className="badge badge-gold font-weight-bold">
+                      +{c.pointsReward} VE Pts
+                    </span>
                   </div>
 
-                  <div className="flex-grow-1">
-                    <div className="d-flex justify-content-between align-items-center mb-1">
-                      <span className="badge bg-secondary text-light small">{c.category}</span>
-                      <span className="badge bg-warning text-dark font-weight-bold">
-                        +{c.pointsReward} VE Pts
-                      </span>
-                    </div>
-                    <h5 className="font-weight-bold text-white mb-1">{c.title}</h5>
-                    <p className="small text-secondary mb-0">{c.description}</p>
-                  </div>
+                  <span className="badge badge-indigo small mb-2">{c.category}</span>
+                  <h5 className="font-weight-bold text-dark mb-2">{c.title}</h5>
+                  <p className="small text-muted mb-4">{c.description}</p>
                 </div>
 
                 <div>
-                  <div className="d-flex justify-content-between small text-secondary mb-1">
-                    <span>Progress</span>
-                    <span>{c.progress} / {c.targetCount}</span>
-                  </div>
-                  <div className="progress bg-dark-subtle rounded-pill mb-3" style={{ height: '8px' }}>
-                    <div
-                      className="progress-bar bg-success rounded-pill"
-                      style={{ width: `${Math.min(100, (c.progress / c.targetCount) * 100)}%` }}
-                    />
-                  </div>
-
                   {c.claimed ? (
-                    <button className="btn btn-outline-success w-100 rounded-3 disabled" disabled>
-                      <CheckCircle size={16} className="me-1" /> Claimed Today
-                    </button>
+                    <div className="alert alert-success py-2 px-3 mb-0 text-center small font-weight-bold rounded-3">
+                      <CheckCircle2 size={16} className="me-1" /> Claimed
+                    </div>
                   ) : (
                     <button
-                      className="btn btn-warning w-100 font-weight-bold rounded-3"
+                      type="button"
+                      className="btn btn-indigo w-100 font-weight-bold"
                       disabled={claimingId === c.id}
                       onClick={() => handleClaim(c.id)}
                     >
-                      {claimingId === c.id ? 'Claiming...' : `Claim +${c.pointsReward} VE Points`}
+                      {claimingId === c.id ? 'Claiming...' : 'Claim Points'}
                     </button>
                   )}
                 </div>
@@ -160,3 +158,5 @@ export const Challenges = () => {
     </div>
   );
 };
+
+export default Challenges;
