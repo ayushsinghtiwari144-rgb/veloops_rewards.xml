@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getNotificationsApi, markAllNotificationsReadApi } from '../../services/hubService';
@@ -22,14 +22,18 @@ export const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
   const [notificationsData, setNotificationsData] = useState({ unreadCount: 0, notifications: [] });
+  const notifRef = useRef(null);
 
   const fetchNotifs = async () => {
     if (isAuthenticated) {
       try {
         const data = await getNotificationsApi();
-        setNotificationsData(data);
+        setNotificationsData({
+          unreadCount: data?.unreadCount || 0,
+          notifications: Array.isArray(data?.notifications) ? data.notifications : []
+        });
       } catch (err) {
-        // silent catch
+        // silent catch on network errors
       }
     }
   };
@@ -40,13 +44,24 @@ export const Navbar = () => {
     return () => clearInterval(interval);
   }, [isAuthenticated, location.pathname]);
 
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (notifRef.current && !notifRef.current.contains(event.target)) {
+        setNotifDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const handleMarkAllRead = async () => {
     try {
       await markAllNotificationsReadApi();
       setNotificationsData(prev => ({
         ...prev,
         unreadCount: 0,
-        notifications: prev.notifications.map(n => ({ ...n, read: true }))
+        notifications: (prev.notifications || []).map(n => ({ ...n, read: true }))
       }));
     } catch (err) {
       // silent
@@ -54,12 +69,15 @@ export const Navbar = () => {
   };
 
   const handleLogout = async () => {
+    setMobileMenuOpen(false);
+    setNotifDropdownOpen(false);
     await logout();
     navigate('/login');
   };
 
   const scrollToSection = (sectionId) => {
     setMobileMenuOpen(false);
+    setNotifDropdownOpen(false);
     if (location.pathname !== '/' && location.pathname !== '/dashboard') {
       navigate('/', { state: { scrollTo: sectionId } });
       setTimeout(() => {
@@ -83,6 +101,8 @@ export const Navbar = () => {
     { label: 'Leaderboard', sectionId: 'leaderboard' },
     { label: 'FAQ', sectionId: 'faq' }
   ];
+
+  const safeNotifications = Array.isArray(notificationsData?.notifications) ? notificationsData.notifications : [];
 
   return (
     <nav className={`navbar navbar-expand-lg ${styles.navbar}`}>
@@ -131,26 +151,26 @@ export const Navbar = () => {
             )}
           </ul>
 
-          <div className="d-flex align-items-center gap-3">
+          <div className="d-flex align-items-center gap-3 flex-wrap">
             {isAuthenticated && user ? (
               <>
                 <div className={styles.pointsBadge} title="Your VE Points Balance">
                   <Coins size={16} />
-                  <span>{user.pointsBalance?.toLocaleString() || 0} VE</span>
+                  <span>{(user.pointsBalance || 0).toLocaleString()} VE</span>
                 </div>
 
                 <div className={styles.levelBadge}>
                   Lvl {user.level || 1}
                 </div>
 
-                <div className="position-relative">
+                <div className="position-relative" ref={notifRef}>
                   <button
                     className={styles.notifBtn}
                     onClick={() => setNotifDropdownOpen(!notifDropdownOpen)}
                     title="Notifications"
                   >
                     <Bell size={18} />
-                    {notificationsData.unreadCount > 0 && <div className={styles.notifDot} />}
+                    {(notificationsData?.unreadCount || 0) > 0 && <div className={styles.notifDot} />}
                   </button>
 
                   {notifDropdownOpen && (
@@ -160,9 +180,9 @@ export const Navbar = () => {
                     >
                       <div className="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
                         <h6 className="mb-0 text-dark font-weight-bold">Notifications</h6>
-                        {notificationsData.unreadCount > 0 && (
+                        {(notificationsData?.unreadCount || 0) > 0 && (
                           <button
-                            className="btn btn-sm text-primary p-0 fs-7 border-0 bg-transparent"
+                            className="btn btn-sm text-primary p-0 fs-7 border-0 bg-transparent font-weight-bold"
                             onClick={handleMarkAllRead}
                           >
                             Mark all read
@@ -170,12 +190,12 @@ export const Navbar = () => {
                         )}
                       </div>
 
-                      {notificationsData.notifications?.length === 0 ? (
+                      {safeNotifications.length === 0 ? (
                         <p className="text-muted small mb-0 text-center py-3">No notifications yet.</p>
                       ) : (
-                        notificationsData.notifications.slice(0, 8).map(n => (
+                        safeNotifications.slice(0, 8).map(n => (
                           <div
-                            key={n._id}
+                            key={n._id || n.id || Math.random()}
                             className={`p-2 mb-2 rounded ${n.read ? 'bg-transparent' : 'bg-light border-start border-3 border-primary'}`}
                           >
                             <p className="small text-dark mb-1 font-weight-bold">{n.title}</p>
@@ -187,13 +207,13 @@ export const Navbar = () => {
                   )}
                 </div>
 
-                <Link to="/profile" className={styles.userBtn} title="My Account">
+                <Link to="/profile" className={styles.userBtn} title="My Account" onClick={() => setMobileMenuOpen(false)}>
                   <User size={16} />
                   <span>{user.name?.split(' ')[0] || 'User'}</span>
                 </Link>
 
                 <button
-                  className="btn btn-outline-danger btn-sm rounded-3 px-2 py-1"
+                  className="btn btn-outline-danger btn-sm rounded-3 px-2 py-1 font-weight-semibold"
                   onClick={handleLogout}
                   title="Sign Out"
                 >
@@ -202,10 +222,10 @@ export const Navbar = () => {
               </>
             ) : (
               <div className="d-flex align-items-center gap-2">
-                <Link to="/login" className="btn btn-outline-indigo btn-sm rounded-3 px-3 font-weight-semibold">
+                <Link to="/login" className="btn btn-outline-indigo btn-sm rounded-3 px-3 font-weight-semibold" onClick={() => setMobileMenuOpen(false)}>
                   Sign In
                 </Link>
-                <Link to="/register" className="btn btn-indigo btn-sm rounded-3 px-3 font-weight-bold d-flex align-items-center gap-1">
+                <Link to="/register" className="btn btn-indigo btn-sm rounded-3 px-3 font-weight-bold d-flex align-items-center gap-1" onClick={() => setMobileMenuOpen(false)}>
                   <span>Get Started</span>
                   <ArrowRight size={14} />
                 </Link>
