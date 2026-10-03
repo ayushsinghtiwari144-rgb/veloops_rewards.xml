@@ -76,11 +76,11 @@ export const Navbar = () => {
 
   const navItems = [
     { label: 'Home', sectionId: 'hero' },
-    { label: 'Journey', sectionId: 'journey' },
-    { label: 'Missions', sectionId: 'missions' },
-    { label: 'Rewards', sectionId: 'reward-discovery' },
-    { label: 'Achievements', sectionId: 'achievements-showcase' },
-    { label: 'How It Works', sectionId: 'how-it-works' },
+    { label: 'Missions', sectionId: 'challenges' },
+    { label: 'Rewards', sectionId: 'rewards' },
+    { label: 'Level Journey', sectionId: 'level-journey' },
+    { label: 'Achievements', sectionId: 'achievements' },
+    { label: 'Leaderboard', sectionId: 'leaderboard' },
     { label: 'FAQ', sectionId: 'faq' }
   ];
 
@@ -202,10 +202,10 @@ export const Navbar = () => {
               </>
             ) : (
               <div className="d-flex align-items-center gap-2">
-                <Link to="/login" className="btn btn-outline-indigo btn-sm rounded-3 px-3">
+                <Link to="/login" className="btn btn-outline-indigo btn-sm rounded-3 px-3 font-weight-semibold">
                   Sign In
                 </Link>
-                <Link to="/register" className="btn btn-indigo btn-sm rounded-3 px-3 d-flex align-items-center gap-1">
+                <Link to="/register" className="btn btn-indigo btn-sm rounded-3 px-3 font-weight-bold d-flex align-items-center gap-1">
                   <span>Get Started</span>
                   <ArrowRight size={14} />
                 </Link>
