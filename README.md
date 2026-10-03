@@ -4,7 +4,7 @@ A modern, responsive and interactive rewards platform designed to provide users 
 
 ## 🌐 Live Demo
 
-👉 [View Live Website](https://veloop-rewards-so37.vercel.app/)
+👉 [View] https://veloop-rewards-landing-page.vercel.app
 
 ## 💻 GitHub Repository
 
