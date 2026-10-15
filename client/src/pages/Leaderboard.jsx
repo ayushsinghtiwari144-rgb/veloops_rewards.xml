@@ -35,7 +35,7 @@ export const Leaderboard = () => {
           <p className="text-muted mb-0">Top VELOOP Rewards Hub members ranked by VE Points and level achievements</p>
         </div>
 
-        <div className="d-flex align-items-center gap-2 bg-white p-1 rounded-3 border">
+        <div className="d-flex align-items-center gap-2 p-1 rounded-3 border" style={{ background: 'rgba(14, 21, 36, 0.85)', borderColor: 'rgba(255, 255, 255, 0.1)' }}>
           <button
             type="button"
             className={`btn btn-sm px-4 rounded-2 font-weight-bold ${period === 'weekly' ? 'btn-indigo' : 'text-muted border-0 bg-transparent'}`}

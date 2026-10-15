@@ -1,14 +1,14 @@
 .footer {
-  background-color: #ffffff;
-  border-top: 1px solid #e2e8f0;
-  padding: 4rem 0 2rem 0;
+  background-color: #080c14;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 4.5rem 0 2.5rem 0;
   margin-top: 5rem;
 }
 
 .title {
   font-weight: 700;
   font-size: 1rem;
-  color: #0f172a;
+  color: #f8fafc;
   margin-bottom: 1.25rem;
 }
 
@@ -23,7 +23,7 @@
 
 .linkList button,
 .linkList a {
-  color: #64748b;
+  color: #94a3b8;
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 500;
@@ -37,11 +37,11 @@
 
 .linkList button:hover,
 .linkList a:hover {
-  color: #4f46e5;
-  transform: translateX(2px);
+  color: #818cf8;
+  transform: translateX(3px);
 }
 
 .divider {
-  border-color: #e2e8f0;
+  border-color: rgba(255, 255, 255, 0.08);
   margin: 3rem 0 1.5rem 0;
 }

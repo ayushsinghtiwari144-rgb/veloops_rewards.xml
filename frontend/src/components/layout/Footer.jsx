@@ -8,14 +8,15 @@ export const Footer = () => {
   const location = useLocation();
 
   const scrollToSection = (sectionId) => {
+    let target = sectionId;
+    if (target === 'ways-to-earn') target = 'challenges';
+    if (target === 'how-it-works') target = 'level-journey';
+    if (target === 'benefits') target = 'why-veloop';
+
     if (location.pathname !== '/' && location.pathname !== '/dashboard') {
-      navigate('/', { state: { scrollTo: sectionId } });
-      setTimeout(() => {
-        const el = document.getElementById(sectionId);
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
+      navigate('/', { state: { scrollTo: target } });
     } else {
-      const el = document.getElementById(sectionId);
+      const el = document.getElementById(target);
       if (el) {
         el.scrollIntoView({ behavior: 'smooth' });
       }
@@ -31,10 +32,10 @@ export const Footer = () => {
               <div className="p-2 rounded-3 bg-primary text-white d-flex align-items-center justify-content-center">
                 <Sparkles size={20} />
               </div>
-              <span className="h5 mb-0 font-weight-bold text-dark">VELOOP Rewards Hub</span>
+              <span className="h5 mb-0 font-weight-bold text-white">VELOOP Rewards Hub</span>
             </div>
             <p className="text-muted small leading-relaxed mb-4">
-              VELOOP Rewards Hub is a points-based rewards platform where members complete daily activities and challenges, earn VE Points, unlock achievements, and redeem exclusive rewards.
+              VELOOP Rewards Hub is a points-based rewards platform where members complete daily activities and challenges, earn VE Points, unlock achievements, participate in giveaways, and redeem exclusive rewards.
             </p>
             <div className="d-flex align-items-center gap-3 text-muted small">
               <div className="d-flex align-items-center gap-1">
@@ -52,9 +53,10 @@ export const Footer = () => {
             <h6 className={styles.title}>Quick Links</h6>
             <ul className={styles.linkList}>
               <li><button type="button" onClick={() => scrollToSection('hero')}>Home</button></li>
-              <li><button type="button" onClick={() => scrollToSection('ways-to-earn')}>Ways to Earn</button></li>
-              <li><button type="button" onClick={() => scrollToSection('how-it-works')}>How It Works</button></li>
-              <li><button type="button" onClick={() => scrollToSection('benefits')}>Benefits</button></li>
+              <li><button type="button" onClick={() => scrollToSection('challenges')}>Ways to Earn</button></li>
+              <li><button type="button" onClick={() => scrollToSection('giveaways')}>Giveaways</button></li>
+              <li><button type="button" onClick={() => scrollToSection('level-journey')}>How It Works</button></li>
+              <li><button type="button" onClick={() => scrollToSection('why-veloop')}>Benefits</button></li>
               <li><button type="button" onClick={() => scrollToSection('faq')}>FAQ</button></li>
             </ul>
           </div>
@@ -63,7 +65,8 @@ export const Footer = () => {
             <h6 className={styles.title}>Hub Features</h6>
             <ul className={styles.linkList}>
               <li><button type="button" onClick={() => scrollToSection('rewards')}>Rewards Store</button></li>
-              <li><button type="button" onClick={() => scrollToSection('challenges')}>Daily & Weekly Challenges</button></li>
+              <li><button type="button" onClick={() => scrollToSection('challenges')}>Daily Missions</button></li>
+              <li><Link to="/winners">Giveaway Winners</Link></li>
               <li><button type="button" onClick={() => scrollToSection('leaderboard')}>Community Leaderboard</button></li>
               <li><button type="button" onClick={() => scrollToSection('achievements')}>Achievement Badges</button></li>
               <li><Link to="/history">Points History</Link></li>

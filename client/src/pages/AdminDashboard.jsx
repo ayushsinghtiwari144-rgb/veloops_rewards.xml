@@ -36,14 +36,14 @@ export const AdminDashboard = () => {
 
   const loadAdminData = async () => {
     try {
-      const [statsData, redData, usersData] = await Promise.all([
+      const [statsResult, redResult, usersResult] = await Promise.allSettled([
         getAdminStatsApi(),
         getAllRedemptionsApi(),
         getAllUsersApi()
       ]);
-      setStats(statsData);
-      setRedemptions(redData || []);
-      setUsersList(usersData || []);
+      if (statsResult.status === 'fulfilled') setStats(statsResult.value || {});
+      if (redResult.status === 'fulfilled') setRedemptions(Array.isArray(redResult.value) ? redResult.value : []);
+      if (usersResult.status === 'fulfilled') setUsersList(Array.isArray(usersResult.value) ? usersResult.value : []);
     } catch (err) {
       console.error('Failed to load admin data:', err);
     }

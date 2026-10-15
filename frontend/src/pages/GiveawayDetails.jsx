@@ -8,11 +8,13 @@ import PrizeClaimModal from '../components/winner/PrizeClaimModal';
 import { useAuth } from '../context/AuthContext';
 import {
   fetchGiveawayByIdApi,
+  fetchCurrentGiveawaysApi,
   fetchMyParticipationStatusApi,
   joinGiveawayApi,
   getMyClaimApi,
   getWinnersApi
 } from '../services/giveawayService';
+import { mockGiveaways } from '../data/giveawayData';
 
 const GiveawayDetails = () => {
   const { slug } = useParams();
@@ -49,17 +51,25 @@ const GiveawayDetails = () => {
           setGiveaway(currentGw);
         }
       } catch (err) {
-        // Fallback: Check if slug matches current active giveaways
+        // Fallback: Check if slug matches current active giveaways or mock data
         try {
           const currentList = await fetchCurrentGiveawaysApi();
-          const match = currentList.find(g => g.slug === slug || g.id === slug || g._id === slug) || currentList[0];
+          const match = (currentList || []).find(g => g.slug === slug || g.id === slug || g._id === slug);
           if (isMounted && match) {
             currentGw = match;
             setGiveaway(currentGw);
+          } else {
+            const mockMatch = mockGiveaways.find(g => g.slug === slug || g.id === slug) || mockGiveaways[0];
+            if (isMounted && mockMatch) {
+              currentGw = mockMatch;
+              setGiveaway(currentGw);
+            }
           }
         } catch (fallbackErr) {
-          if (isMounted) {
-            setGiveaway(null);
+          const mockMatch = mockGiveaways.find(g => g.slug === slug || g.id === slug) || mockGiveaways[0];
+          if (isMounted && mockMatch) {
+            currentGw = mockMatch;
+            setGiveaway(currentGw);
           }
         }
       }

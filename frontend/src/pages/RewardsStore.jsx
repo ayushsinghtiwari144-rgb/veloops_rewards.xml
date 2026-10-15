@@ -100,12 +100,13 @@ export const RewardsStore = () => {
 
         <div className="col-md-4">
           <div className="input-group">
-            <span className="input-group-text bg-white border-end-0 text-muted">
+            <span className="input-group-text border-end-0 text-muted" style={{ background: 'rgba(19, 27, 46, 0.9)', borderColor: 'rgba(255, 255, 255, 0.1)' }}>
               <Search size={16} />
             </span>
             <input
               type="text"
-              className="form-control bg-white border-start-0 text-dark"
+              className="form-control border-start-0 text-white"
+              style={{ background: 'rgba(19, 27, 46, 0.9)', borderColor: 'rgba(255, 255, 255, 0.1)' }}
               placeholder="Search rewards..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}

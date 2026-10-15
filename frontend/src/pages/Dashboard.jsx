@@ -20,24 +20,17 @@ import {
   CheckCircle2,
   ArrowRight,
   ShoppingBag,
-  TrendingUp,
   Target,
   Shield,
   ChevronDown,
   ChevronUp,
-  Lock,
   Search,
-  Check,
   Activity,
-  ArrowUpRight,
   AlertCircle,
-  Calendar,
-  Clock,
-  Layers,
-  Star,
   Flame,
-  UserCheck
+  Users
 } from 'lucide-react';
+import { mockGiveaways } from '../data/giveawayData';
 
 export const Dashboard = () => {
   const { user, isAuthenticated, refreshUser } = useAuth();
@@ -70,7 +63,11 @@ export const Dashboard = () => {
   // Handle scroll to section if passed via location state
   useEffect(() => {
     if (location.state?.scrollTo) {
-      const el = document.getElementById(location.state.scrollTo);
+      let targetId = location.state.scrollTo;
+      if (targetId === 'ways-to-earn') targetId = 'challenges';
+      if (targetId === 'how-it-works') targetId = 'level-journey';
+      if (targetId === 'benefits') targetId = 'why-veloop';
+      const el = document.getElementById(targetId);
       if (el) {
         setTimeout(() => {
           el.scrollIntoView({ behavior: 'smooth' });
@@ -82,18 +79,31 @@ export const Dashboard = () => {
   const loadHubData = async () => {
     setLoading(true);
     try {
-      const [rewardsData, challengesData, leaderboardData, achievementsData, txData] = await Promise.all([
+      const [rewardsResult, challengesResult, leaderboardResult, achievementsResult, txResult] = await Promise.allSettled([
         getRewardsApi(),
-        getChallengesApi(),
+        isAuthenticated ? getChallengesApi() : Promise.resolve([]),
         getLeaderboardApi('weekly'),
-        getAchievementsApi(),
-        getTransactionsApi()
+        isAuthenticated ? getAchievementsApi() : Promise.resolve([]),
+        isAuthenticated ? getTransactionsApi() : Promise.resolve([])
       ]);
-      setRewards(rewardsData || []);
-      setChallenges(challengesData || []);
-      setLeaderboard(leaderboardData || []);
-      setAchievements(achievementsData || []);
-      setTransactions(txData || []);
+
+      if (rewardsResult.status === 'fulfilled' && Array.isArray(rewardsResult.value)) {
+        setRewards(rewardsResult.value);
+      }
+      if (challengesResult.status === 'fulfilled' && Array.isArray(challengesResult.value)) {
+        setChallenges(challengesResult.value);
+      }
+      if (leaderboardResult.status === 'fulfilled') {
+        const lbVal = leaderboardResult.value;
+        const lbArr = Array.isArray(lbVal) ? lbVal : (lbVal?.leaderboard || []);
+        setLeaderboard(lbArr);
+      }
+      if (achievementsResult.status === 'fulfilled' && Array.isArray(achievementsResult.value)) {
+        setAchievements(achievementsResult.value);
+      }
+      if (txResult.status === 'fulfilled' && Array.isArray(txResult.value)) {
+        setTransactions(txResult.value);
+      }
     } catch (err) {
       console.error('Failed to load command center data:', err);
     } finally {
@@ -103,7 +113,7 @@ export const Dashboard = () => {
 
   useEffect(() => {
     loadHubData();
-  }, []);
+  }, [isAuthenticated]);
 
   const handleClaimChallenge = async (challengeId) => {
     if (!isAuthenticated) {
@@ -431,23 +441,23 @@ export const Dashboard = () => {
       {/* SECTION 3 — TARGET REWARD UNLOCK SHOWCASE */}
       <section id="next-reward" className="py-5">
         <div className="container py-3">
-          <div className="card-saas p-4 p-md-5 border-primary shadow-lg overflow-hidden position-relative" style={{ background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 60%, #eef2ff 100%)' }}>
+          <div className="card-saas p-4 p-md-5 shadow-lg overflow-hidden position-relative" style={{ background: 'linear-gradient(135deg, rgba(20, 28, 46, 0.95) 0%, rgba(14, 21, 36, 0.98) 100%)', borderColor: 'rgba(99, 102, 241, 0.35)' }}>
             <div className="d-flex align-items-center justify-content-between mb-3.5 flex-wrap gap-2">
               <span className="badge badge-gold px-3.5 py-2 font-weight-extrabold fs-7">
                 🎯 YOUR NEXT UNLOCK GOAL
               </span>
-              <span className="small text-primary font-weight-extrabold bg-primary bg-opacity-10 px-3 py-1 rounded-pill">
+              <span className="small text-indigo font-weight-extrabold bg-primary-light px-3 py-1 rounded-pill border border-primary border-opacity-25">
                 {progressPercent}% Goal Reached
               </span>
             </div>
 
             <div className="row align-items-center g-4">
               <div className="col-md-4 text-center">
-                <div className="position-relative overflow-hidden rounded-4 shadow-md bg-white p-2">
+                <div className="position-relative overflow-hidden rounded-4 shadow-md bg-dark p-2 border border-white border-opacity-10">
                   <img
                     src={targetReward?.imageUrl || 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&auto=format&fit=crop&q=80'}
                     alt={targetReward?.title || 'Wireless Earbuds'}
-                    className="rounded-3 object-fit-cover w-100 transition-transform duration-300 hover-scale"
+                    className="rounded-3 object-fit-cover w-100 transition-transform duration-300"
                     style={{ maxHeight: '220px' }}
                   />
                   <span className="position-absolute top-0 end-0 m-3 badge badge-gold font-weight-extrabold">
@@ -457,18 +467,18 @@ export const Dashboard = () => {
               </div>
 
               <div className="col-md-8">
-                <h3 className="font-weight-extrabold text-dark mb-2 h2">{targetReward?.title || 'Wireless Earbuds'}</h3>
+                <h3 className="font-weight-extrabold text-white mb-2 h2">{targetReward?.title || 'Wireless Earbuds'}</h3>
                 <p className="text-muted small mb-3.5 leading-relaxed">{targetReward?.description || 'Active Noise Canceling Wireless Earbuds with High-Res Audio & long battery life.'}</p>
 
                 <div className="d-flex justify-content-between small text-muted font-weight-bold mb-1.5">
-                  <span>Target Cost: {targetCost.toLocaleString()} VE Points</span>
-                  <span>Current Balance: {currentPoints.toLocaleString()} VE Points</span>
+                  <span>Target Cost: <strong className="text-white">{targetCost.toLocaleString()} VE Points</strong></span>
+                  <span>Current Balance: <strong className="text-warning">{currentPoints.toLocaleString()} VE Points</strong></span>
                 </div>
 
-                <div className="progress rounded-pill bg-white border mb-3.5 shadow-xs" style={{ height: '14px' }}>
+                <div className="progress rounded-pill bg-dark border border-white border-opacity-10 mb-3.5 shadow-xs" style={{ height: '14px' }}>
                   <div
                     className="progress-bar rounded-pill"
-                    style={{ width: `${progressPercent}%`, background: 'linear-gradient(90deg, #4f46e5 0%, #f59e0b 100%)' }}
+                    style={{ width: `${progressPercent}%`, background: 'linear-gradient(90deg, #6366f1 0%, #f59e0b 100%)' }}
                   />
                 </div>
 
@@ -566,19 +576,20 @@ export const Dashboard = () => {
 
             <div className="d-flex flex-column flex-sm-row gap-2.5">
               <div className="input-group input-group-sm shadow-xs" style={{ width: '230px' }}>
-                <span className="input-group-text bg-white border-end-0 text-muted">
+                <span className="input-group-text border-end-0 text-muted" style={{ background: 'rgba(19, 27, 46, 0.9)', borderColor: 'rgba(255, 255, 255, 0.1)' }}>
                   <Search size={15} />
                 </span>
                 <input
                   type="text"
-                  className="form-control bg-white border-start-0 text-dark small font-weight-medium"
+                  className="form-control border-start-0 text-white small font-weight-medium"
+                  style={{ background: 'rgba(19, 27, 46, 0.9)', borderColor: 'rgba(255, 255, 255, 0.1)' }}
                   placeholder="Search rewards..."
                   value={rewardSearchQuery}
                   onChange={(e) => setRewardSearchQuery(e.target.value)}
                 />
               </div>
 
-              <div className="d-flex flex-wrap gap-1 bg-white p-1 rounded-3 border shadow-xs">
+              <div className="d-flex flex-wrap gap-1 p-1 rounded-3 border shadow-xs" style={{ background: 'rgba(14, 21, 36, 0.85)', borderColor: 'rgba(255, 255, 255, 0.1)' }}>
                 {['ALL', 'ELECTRONICS', 'ACCESSORIES', 'GIFT_CARDS', 'MERCHANDISE'].map(cat => (
                   <button
                     key={cat}
@@ -676,6 +687,62 @@ export const Dashboard = () => {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 5.5 — LIVE GIVEAWAYS & LUCKY DRAWS */}
+      <section id="giveaways" className="py-5 bg-white border-y">
+        <div className="container py-3">
+          <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+            <div>
+              <span className="badge badge-gold mb-2 font-weight-bold">Exclusive Drawings</span>
+              <h2 className="section-title h1 mb-1">Live Promotional Giveaways</h2>
+              <p className="text-muted mb-0">Use your VE Points to claim verified entry tickets for high-value tech prizes.</p>
+            </div>
+
+            <Link to="/winners" className="btn btn-outline-indigo font-weight-extrabold px-4">
+              Recent Winners Wall
+            </Link>
+          </div>
+
+          <div className="row g-4">
+            {mockGiveaways.map(gw => (
+              <div key={gw.id} className="col-lg-4 col-md-6">
+                <div className="card-saas h-100 p-4 d-flex flex-column justify-content-between">
+                  <div>
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                      <span className="badge badge-gold font-weight-bold">⚡ Active Drawing</span>
+                      <span className="badge badge-indigo small font-weight-bold">{gw.entryAmount} VE Cost</span>
+                    </div>
+
+                    <h4 className="font-weight-extrabold text-white mb-2">{gw.name}</h4>
+                    <p className="text-muted small leading-relaxed mb-3">{gw.description}</p>
+
+                    <div className="p-3 rounded-3 bg-light border border-white border-opacity-10 mb-3">
+                      <div className="d-flex justify-content-between align-items-center small mb-1.5">
+                        <span className="text-muted font-weight-medium">Registered Entries</span>
+                        <span className="text-warning font-weight-extrabold d-flex align-items-center gap-1">
+                          <Users size={14} /> {gw.participants.toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="d-flex justify-content-between align-items-center small">
+                        <span className="text-muted font-weight-medium">Selection</span>
+                        <span className="text-light font-weight-semibold">Provably Fair Draw</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Link
+                    to={`/giveaway/${gw.slug}`}
+                    className="btn btn-indigo w-100 font-weight-extrabold rounded-3 py-2.5 d-flex align-items-center justify-content-center gap-2"
+                  >
+                    <span>Enter Giveaway</span>
+                    <ArrowRight size={16} />
+                  </Link>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -808,9 +875,9 @@ export const Dashboard = () => {
                       <td className="py-3.5 px-4 font-weight-extrabold fs-6">
                         {idx === 0 ? '🥇 #1' : idx === 1 ? '🥈 #2' : '🥉 #3'}
                       </td>
-                      <td className="py-3.5 px-4 font-weight-extrabold text-dark">{entry.maskedName}</td>
-                      <td className="py-3.5 px-4 text-end"><span className="badge badge-indigo font-weight-bold">Lvl {entry.level}</span></td>
-                      <td className="py-3.5 px-4 text-end font-weight-extrabold text-primary">{entry.points?.toLocaleString()} VE</td>
+                      <td className="py-3.5 px-4 font-weight-extrabold text-dark">{entry.maskedName || entry.name || 'User'}</td>
+                      <td className="py-3.5 px-4 text-end"><span className="badge badge-indigo font-weight-bold">Lvl {entry.level || 1}</span></td>
+                      <td className="py-3.5 px-4 text-end font-weight-extrabold text-primary">{(entry.points ?? 0).toLocaleString()} VE</td>
                     </tr>
                   ))}
                 </tbody>
@@ -925,9 +992,9 @@ export const Dashboard = () => {
       {/* SECTION 12 — FINAL CTA */}
       <section id="final-cta" className="py-5 bg-white border-y">
         <div className="container py-4 text-center">
-          <div className="p-5 rounded-4 bg-primary text-white shadow-xl" style={{ background: 'linear-gradient(135deg, #4f46e5 0%, #312e81 100%)' }}>
+          <div className="p-5 rounded-4 text-white shadow-xl" style={{ background: 'linear-gradient(135deg, rgba(79, 70, 229, 0.35) 0%, rgba(14, 21, 36, 0.98) 100%)', border: '1px solid rgba(99, 102, 241, 0.3)' }}>
             <h2 className="display-4 font-weight-extrabold mb-3 text-white">What's your next milestone?</h2>
-            <p className="lead mb-4 opacity-90 mx-auto font-weight-normal" style={{ maxWidth: '600px' }}>
+            <p className="lead mb-4 text-secondary mx-auto font-weight-normal" style={{ maxWidth: '600px' }}>
               Complete activities, build your progress and explore what you can unlock today.
             </p>
 
@@ -944,7 +1011,7 @@ export const Dashboard = () => {
               </button>
               <button
                 type="button"
-                className="btn btn-outline-light btn-lg px-4.5 font-weight-bold"
+                className="btn btn-outline-indigo btn-lg px-4.5 font-weight-bold"
                 onClick={() => {
                   const el = document.getElementById('challenges');
                   if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -959,12 +1026,12 @@ export const Dashboard = () => {
 
       {/* MODAL: Reward Redemption Modal */}
       {redeemingReward && (
-        <div className="modal show d-block" style={{ backgroundColor: 'rgba(15,23,42,0.65)' }} tabIndex="-1">
+        <div className="modal show d-block" style={{ backgroundColor: 'rgba(5, 8, 15, 0.85)', backdropFilter: 'blur(8px)' }} tabIndex="-1">
           <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content border-0 rounded-4 shadow-xl">
-              <div className="modal-header border-bottom">
-                <h5 className="modal-title font-weight-extrabold text-dark">Redeem {redeemingReward.title}</h5>
-                <button type="button" className="btn-close" onClick={() => setRedeemingReward(null)} />
+            <div className="modal-content rounded-4 shadow-xl" style={{ background: '#0e1524', border: '1px solid rgba(255, 255, 255, 0.12)' }}>
+              <div className="modal-header border-bottom" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}>
+                <h5 className="modal-title font-weight-extrabold text-white">Redeem {redeemingReward.title}</h5>
+                <button type="button" className="btn-close btn-close-white" onClick={() => setRedeemingReward(null)} />
               </div>
 
               <div className="modal-body p-4">

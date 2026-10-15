@@ -14,14 +14,19 @@ import { AdminDashboard } from './pages/AdminDashboard';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { NotFound } from './pages/NotFound';
+import GiveawayDetails from './pages/GiveawayDetails';
+import Winners from './pages/Winners';
+import Account from './pages/Account';
 import ProtectedRoute from './components/common/ProtectedRoute';
 
 const ScrollToTop = () => {
-  const { pathname } = useLocation();
+  const location = useLocation();
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+    if (!location.state?.scrollTo) {
+      window.scrollTo(0, 0);
+    }
+  }, [location.pathname, location.state]);
 
   return null;
 };
@@ -44,6 +49,10 @@ function App() {
               <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+              <Route path="/giveaway/:slug" element={<GiveawayDetails />} />
+              <Route path="/giveaways" element={<Winners />} />
+              <Route path="/winners" element={<Winners />} />
+              <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="*" element={<NotFound />} />

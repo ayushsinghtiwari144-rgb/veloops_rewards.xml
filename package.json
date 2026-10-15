@@ -1,0 +1,9 @@
+{
+  "name": "veloop-rewards",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "npm run build --prefix client",
+    "install:client": "npm install --prefix client"
+  }
+}

@@ -8,6 +8,7 @@ const achievementRoutes = require('./achievementRoutes');
 const transactionRoutes = require('./transactionRoutes');
 const notificationRoutes = require('./notificationRoutes');
 const adminRoutes = require('./adminRoutes');
+const giveawayRoutes = require('./giveawayRoutes');
 
 const router = express.Router();
 
@@ -52,5 +53,6 @@ router.use('/achievements', achievementRoutes);
 router.use('/transactions', transactionRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/admin', adminRoutes);
+router.use('/giveaways', giveawayRoutes);
 
 module.exports = router;

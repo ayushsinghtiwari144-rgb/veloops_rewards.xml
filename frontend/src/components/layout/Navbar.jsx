@@ -22,7 +22,37 @@ export const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
   const [notificationsData, setNotificationsData] = useState({ unreadCount: 0, notifications: [] });
+  const [activeSection, setActiveSection] = useState('hero');
   const notifRef = useRef(null);
+
+  // Dynamic active section observer based on scroll position
+  useEffect(() => {
+    if (location.pathname !== '/' && location.pathname !== '/dashboard') {
+      setActiveSection('');
+      return;
+    }
+
+    const sectionIds = ['hero', 'challenges', 'rewards', 'giveaways', 'level-journey', 'achievements', 'leaderboard', 'faq'];
+
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 120;
+      for (let i = sectionIds.length - 1; i >= 0; i--) {
+        const el = document.getElementById(sectionIds[i]);
+        if (el) {
+          const top = el.offsetTop;
+          if (scrollPosition >= top) {
+            setActiveSection(sectionIds[i]);
+            return;
+          }
+        }
+      }
+      setActiveSection('hero');
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [location.pathname]);
 
   const fetchNotifs = async () => {
     if (isAuthenticated) {
@@ -80,10 +110,6 @@ export const Navbar = () => {
     setNotifDropdownOpen(false);
     if (location.pathname !== '/' && location.pathname !== '/dashboard') {
       navigate('/', { state: { scrollTo: sectionId } });
-      setTimeout(() => {
-        const el = document.getElementById(sectionId);
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
     } else {
       const el = document.getElementById(sectionId);
       if (el) {
@@ -96,6 +122,7 @@ export const Navbar = () => {
     { label: 'Home', sectionId: 'hero' },
     { label: 'Missions', sectionId: 'challenges' },
     { label: 'Rewards', sectionId: 'rewards' },
+    { label: 'Giveaways', sectionId: 'giveaways' },
     { label: 'Level Journey', sectionId: 'level-journey' },
     { label: 'Achievements', sectionId: 'achievements' },
     { label: 'Leaderboard', sectionId: 'leaderboard' },
@@ -115,33 +142,41 @@ export const Navbar = () => {
         </Link>
 
         <button
-          className="navbar-toggler border-0 text-dark shadow-none p-1"
+          className="navbar-toggler border-0 text-white shadow-none p-1"
           type="button"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-expanded={mobileMenuOpen}
+          aria-controls="navbarContent"
           aria-label="Toggle navigation"
         >
-          {mobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
+          {mobileMenuOpen ? <X size={26} className="text-white" /> : <Menu size={26} className="text-white" />}
         </button>
 
-        <div className={`collapse navbar-collapse ${mobileMenuOpen ? 'show mt-3 mt-lg-0' : ''}`}>
+        <div
+          id="navbarContent"
+          className={`collapse navbar-collapse ${mobileMenuOpen ? 'show mt-3 mt-lg-0' : ''}`}
+        >
           <ul className="navbar-nav mx-auto mb-3 mb-lg-0 gap-1 align-items-lg-center">
-            {navItems.map(item => (
-              <li className="nav-item" key={item.sectionId}>
-                <button
-                  type="button"
-                  className={styles.navLink}
-                  onClick={() => scrollToSection(item.sectionId)}
-                >
-                  {item.label}
-                </button>
-              </li>
-            ))}
+            {navItems.map(item => {
+              const isActive = (location.pathname === '/' || location.pathname === '/dashboard') && activeSection === item.sectionId;
+              return (
+                <li className="nav-item" key={item.sectionId}>
+                  <button
+                    type="button"
+                    className={`${styles.navLink} ${isActive ? styles.navLinkActive : ''}`}
+                    onClick={() => scrollToSection(item.sectionId)}
+                  >
+                    {item.label}
+                  </button>
+                </li>
+              );
+            })}
 
             {user?.role === 'ADMIN' && (
               <li className="nav-item">
                 <Link
                   to="/admin"
-                  className={styles.navLink}
+                  className={`${styles.navLink} ${location.pathname === '/admin' ? styles.navLinkActive : ''}`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <ShieldCheck size={16} />
@@ -174,15 +209,12 @@ export const Navbar = () => {
                   </button>
 
                   {notifDropdownOpen && (
-                    <div
-                      className="position-absolute end-0 mt-2 p-3 bg-white border rounded-3 shadow-lg"
-                      style={{ width: '320px', zIndex: 1100, maxHeight: '400px', overflowY: 'auto' }}
-                    >
+                    <div className={styles.notifDropdown}>
                       <div className="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
-                        <h6 className="mb-0 text-dark font-weight-bold">Notifications</h6>
+                        <h6 className="mb-0 text-white font-weight-bold">Notifications</h6>
                         {(notificationsData?.unreadCount || 0) > 0 && (
                           <button
-                            className="btn btn-sm text-primary p-0 fs-7 border-0 bg-transparent font-weight-bold"
+                            className="btn btn-sm text-indigo p-0 fs-7 border-0 bg-transparent font-weight-bold"
                             onClick={handleMarkAllRead}
                           >
                             Mark all read
@@ -193,12 +225,12 @@ export const Navbar = () => {
                       {safeNotifications.length === 0 ? (
                         <p className="text-muted small mb-0 text-center py-3">No notifications yet.</p>
                       ) : (
-                        safeNotifications.slice(0, 8).map(n => (
+                        safeNotifications.slice(0, 8).map((n, idx) => (
                           <div
-                            key={n._id || n.id || Math.random()}
-                            className={`p-2 mb-2 rounded ${n.read ? 'bg-transparent' : 'bg-light border-start border-3 border-primary'}`}
+                            key={n._id || n.id || `notif-${idx}`}
+                            className={`p-2 mb-2 rounded ${n.read ? 'bg-transparent text-secondary' : 'bg-light border-start border-3 border-primary text-white'}`}
                           >
-                            <p className="small text-dark mb-1 font-weight-bold">{n.title}</p>
+                            <p className="small mb-1 font-weight-bold">{n.title}</p>
                             <p className="small text-muted mb-0">{n.message}</p>
                           </div>
                         ))

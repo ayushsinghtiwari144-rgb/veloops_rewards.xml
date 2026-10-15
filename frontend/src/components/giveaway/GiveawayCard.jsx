@@ -42,12 +42,12 @@ const GiveawayCard = ({ giveaway }) => {
       </div>
 
       <div className="card-body d-flex flex-column p-4">
-        <h5 className="fw-bold text-dark mb-2">{giveawayTitle}</h5>
+        <h5 className="fw-bold text-white mb-2">{giveawayTitle}</h5>
         <p className="text-secondary small mb-3 flex-grow-1" style={{ lineHeight: '1.5' }}>
           {description}
         </p>
 
-        <div className="mb-3 p-2 bg-light rounded border border-light">
+        <div className="mb-3 p-2 bg-light rounded border border-secondary border-opacity-10">
           <div className="text-muted extra-small fw-bold text-uppercase mb-1" style={{ fontSize: '0.65rem' }}>
             Time Remaining
           </div>
@@ -57,7 +57,7 @@ const GiveawayCard = ({ giveaway }) => {
         <div className="d-flex align-items-center justify-content-between mb-3 pt-2 border-top">
           <div className="d-flex align-items-center gap-1 text-secondary small">
             <Users size={16} className="text-primary" />
-            <span className="fw-semibold text-dark">{participants}</span> entries
+            <span className="fw-semibold text-white">{participants}</span> entries
           </div>
 
           <div className={styles.entryBadge}>
@@ -67,8 +67,8 @@ const GiveawayCard = ({ giveaway }) => {
         </div>
 
         <Link
-          to={`/giveaway/${giveaway.id || giveaway._id || giveaway.slug}`}
-          className="btn btn-primary w-100 py-2 fw-semibold d-flex align-items-center justify-content-center gap-2"
+          to={`/giveaway/${slug || giveaway.id || giveaway._id}`}
+          className="btn btn-indigo w-100 py-2 fw-semibold d-flex align-items-center justify-content-center gap-2"
         >
           {status === 'ACTIVE' ? 'Join Now' : status === 'UPCOMING' ? 'Pre-Register' : 'View Winner Details'}
           <ArrowRight size={16} />

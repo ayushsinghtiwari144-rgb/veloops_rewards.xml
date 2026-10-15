@@ -25,7 +25,7 @@ export const Profile = () => {
     }
   };
 
-  const xpProgress = user ? Math.min(100, Math.floor((user.xp / (user.level * 500)) * 100)) : 0;
+  const xpProgress = user ? Math.min(100, Math.floor(((user.xp || 0) / ((user.level || 1) * 500)) * 100)) : 0;
 
   return (
     <div className="container py-5">
@@ -34,13 +34,13 @@ export const Profile = () => {
         <div className="col-lg-4">
           <div className="card-saas p-4 text-center">
             <div className="avatar-circle mx-auto bg-primary text-white font-weight-bold display-6 d-flex align-items-center justify-content-center rounded-circle mb-3 shadow-md" style={{ width: '90px', height: '90px' }}>
-              {user?.name?.substring(0, 2).toUpperCase()}
+              {user?.name?.substring(0, 2)?.toUpperCase() || 'U'}
             </div>
-            <h4 className="font-weight-bold text-dark mb-1">{user?.name}</h4>
-            <p className="text-muted small mb-3">{user?.email}</p>
+            <h4 className="font-weight-bold text-dark mb-1">{user?.name || 'User'}</h4>
+            <p className="text-muted small mb-3">{user?.email || ''}</p>
 
             <span className="badge badge-gold px-3 py-1.5 rounded-pill mb-3">
-              Role: {user?.role}
+              Role: {user?.role || 'USER'}
             </span>
 
             <hr className="my-3 border-light" />
@@ -48,15 +48,15 @@ export const Profile = () => {
             <div className="d-flex justify-content-around text-center">
               <div>
                 <span className="small text-muted d-block font-weight-medium">Points</span>
-                <span className="h5 font-weight-bold text-primary">{user?.pointsBalance?.toLocaleString()}</span>
+                <span className="h5 font-weight-bold text-primary">{(user?.pointsBalance ?? 0).toLocaleString()}</span>
               </div>
               <div>
                 <span className="small text-muted d-block font-weight-medium">Level</span>
-                <span className="h5 font-weight-bold text-indigo">Lvl {user?.level}</span>
+                <span className="h5 font-weight-bold text-indigo">Lvl {user?.level || 1}</span>
               </div>
               <div>
                 <span className="small text-muted d-block font-weight-medium">Streak</span>
-                <span className="h5 font-weight-bold text-danger">{user?.streakDays}d</span>
+                <span className="h5 font-weight-bold text-danger">{user?.streakDays || 0}d</span>
               </div>
             </div>
           </div>
